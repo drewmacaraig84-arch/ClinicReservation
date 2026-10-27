@@ -1,0 +1,61 @@
+name: CarePoint Clinic CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  security-test-and-build:
+    name: Security Audit, PHPUnit & Vite CDN Build
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: clinic_reservation
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, ctype, json, pdo, pdo_mysql, bcmath
+          coverage: none
+
+      - name: Install Composer Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Security Vulnerability Audit (Composer)
+        run: composer audit
+
+      - name: Prepare Environment & Run Database Migrations
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan migrate:fresh --seed --force
+
+      - name: Run Automated Feature & Security Tests
+        run: php artisan test
+
+      - name: Setup Node.js 22 & Build Frontend CDN Bundle
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install & Build Vite Assets
+        run: |
+          npm ci
+          npm run build
+          npm audit --audit-level=high
+

@@ -1,0 +1,73 @@
+services:
+  load-balancer:
+    image: nginx:1.27-alpine
+    container_name: carepoint-load-balancer
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html:ro
+      - ./docker/nginx/load-balancer.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app-node-1
+      - app-node-2
+    networks:
+      - carepoint-net
+
+  app-node-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: carepoint-app-node-1
+    environment:
+      APP_NODE_ID: carepoint-node-1
+      DB_HOST: mysql
+      REDIS_HOST: redis
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - carepoint-net
+
+  app-node-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: carepoint-app-node-2
+    environment:
+      APP_NODE_ID: carepoint-node-2
+      DB_HOST: mysql
+      REDIS_HOST: redis
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - carepoint-net
+
+  mysql:
+    image: mysql:8.4
+    container_name: carepoint-mysql
+    environment:
+      MYSQL_DATABASE: clinic_reservation
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "33060:3306"
+    volumes:
+      - carepoint-db-data:/var/lib/mysql
+    networks:
+      - carepoint-net
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: carepoint-redis
+    ports:
+      - "63790:6379"
+    networks:
+      - carepoint-net
+
+networks:
+  carepoint-net:
+    driver: bridge
+
+volumes:
+  carepoint-db-data:
+
