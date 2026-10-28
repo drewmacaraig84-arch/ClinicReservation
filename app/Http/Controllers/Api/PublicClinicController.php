@@ -37,11 +37,14 @@ class PublicClinicController extends Controller
             $doctorId = $requestedDoctorId ?: $doctors->first()?->id;
             $slots = $this->computeSlots((int) $doctorId, $date);
 
-            // Live Queue for TV Display & Quick Status (Eager-loaded to prevent N+1)
+            // Live Queue for TV Display & Quick Status (Eager-loaded to prevent N+1, Parameterized SQL)
             $todayAppointments = Appointment::with(['doctor.department', 'department'])
                 ->whereDate('appointment_date', now()->toDateString())
                 ->whereNull('deleted_at')
-                ->orderByRaw("CASE status WHEN 'serving' THEN 1 WHEN 'called' THEN 2 WHEN 'waiting' THEN 3 WHEN 'checked_in' THEN 4 WHEN 'pending' THEN 5 ELSE 6 END")
+                ->orderByRaw(
+                    'CASE status WHEN ? THEN 1 WHEN ? THEN 2 WHEN ? THEN 3 WHEN ? THEN 4 WHEN ? THEN 5 ELSE 6 END',
+                    ['serving', 'called', 'waiting', 'checked_in', 'pending']
+                )
                 ->orderBy('id')
                 ->get();
 
@@ -200,12 +203,14 @@ class PublicClinicController extends Controller
             return response()->json(['message' => 'Please enter a ticket number, booking reference, or phone number.'], 422);
         }
 
+        $escapedLike = '%' . addcslashes($query, '%_\\') . '%';
+
         $appointment = Appointment::with(['doctor', 'department'])
-            ->where(function ($q) use ($query) {
-                $q->where('ticket_number', $query)
-                    ->orWhere('booking_reference', $query)
-                    ->orWhere('patient_phone', $query)
-                    ->orWhere('patient_name', 'like', "%{$query}%");
+            ->where(function ($q) use ($query, $escapedLike) {
+                $q->where('ticket_number', '=', $query)
+                    ->orWhere('booking_reference', '=', $query)
+                    ->orWhere('patient_phone', '=', $query)
+                    ->orWhere('patient_name', 'like', $escapedLike);
             })
             ->latest('id')
             ->first();

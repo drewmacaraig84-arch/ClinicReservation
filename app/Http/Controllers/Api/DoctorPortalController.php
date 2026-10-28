@@ -33,8 +33,11 @@ class DoctorPortalController extends Controller
             }
 
             $appointments = Appointment::with(['department', 'doctor.department'])
-                ->where('doctor_id', $doctor->id)
-                ->orderByRaw("CASE status WHEN 'serving' THEN 1 WHEN 'called' THEN 2 WHEN 'waiting' THEN 3 WHEN 'checked_in' THEN 4 WHEN 'pending' THEN 5 WHEN 'completed' THEN 6 ELSE 7 END")
+                ->where('doctor_id', '=', $doctor->id)
+                ->orderByRaw(
+                    'CASE status WHEN ? THEN 1 WHEN ? THEN 2 WHEN ? THEN 3 WHEN ? THEN 4 WHEN ? THEN 5 WHEN ? THEN 6 ELSE 7 END',
+                    ['serving', 'called', 'waiting', 'checked_in', 'pending', 'completed']
+                )
                 ->orderBy('appointment_date')
                 ->orderBy('id')
                 ->get();

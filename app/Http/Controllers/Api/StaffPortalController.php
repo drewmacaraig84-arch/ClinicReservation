@@ -31,17 +31,24 @@ class StaffPortalController extends Controller
                 ->whereDate('appointment_date', $date);
 
             if ($search !== '') {
-                $query->where(function ($q) use ($search) {
-                    $q->where('patient_name', 'like', "%{$search}%")
-                        ->orWhere('ticket_number', 'like', "%{$search}%")
-                        ->orWhere('booking_reference', 'like', "%{$search}%")
-                        ->orWhere('patient_phone', 'like', "%{$search}%");
+                $escapedLike = '%' . addcslashes($search, '%_\\') . '%';
+                $query->where(function ($q) use ($escapedLike) {
+                    $q->where('patient_name', 'like', $escapedLike)
+                        ->orWhere('ticket_number', 'like', $escapedLike)
+                        ->orWhere('booking_reference', 'like', $escapedLike)
+                        ->orWhere('patient_phone', 'like', $escapedLike);
                 });
             }
 
             $appointments = $query
-                ->orderByRaw("CASE status WHEN 'called' THEN 1 WHEN 'serving' THEN 2 WHEN 'waiting' THEN 3 WHEN 'checked_in' THEN 4 WHEN 'pending' THEN 5 WHEN 'no_show' THEN 6 WHEN 'completed' THEN 7 ELSE 8 END")
-                ->orderByRaw("CASE priority WHEN 'urgent' THEN 1 WHEN 'senior_pwd' THEN 2 ELSE 3 END")
+                ->orderByRaw(
+                    'CASE status WHEN ? THEN 1 WHEN ? THEN 2 WHEN ? THEN 3 WHEN ? THEN 4 WHEN ? THEN 5 WHEN ? THEN 6 WHEN ? THEN 7 ELSE 8 END',
+                    ['called', 'serving', 'waiting', 'checked_in', 'pending', 'no_show', 'completed']
+                )
+                ->orderByRaw(
+                    'CASE priority WHEN ? THEN 1 WHEN ? THEN 2 ELSE 3 END',
+                    ['urgent', 'senior_pwd']
+                )
                 ->orderBy('id')
                 ->get();
 
@@ -102,11 +109,14 @@ class StaffPortalController extends Controller
         if (!empty($validated['appointment_id'])) {
             $appointment = Appointment::with(['doctor', 'department'])->findOrFail($validated['appointment_id']);
         } else {
-            // Find the next logical ticket in today's queue
+            // Find the next logical ticket in today's queue using parameterized bindings
             $appointment = Appointment::with(['doctor', 'department'])
                 ->whereDate('appointment_date', now()->toDateString())
                 ->whereIn('status', $action === 'call_next' ? ['waiting', 'checked_in'] : ['called', 'serving', 'waiting'])
-                ->orderByRaw("CASE priority WHEN 'urgent' THEN 1 WHEN 'senior_pwd' THEN 2 ELSE 3 END")
+                ->orderByRaw(
+                    'CASE priority WHEN ? THEN 1 WHEN ? THEN 2 ELSE 3 END',
+                    ['urgent', 'senior_pwd']
+                )
                 ->orderBy('id')
                 ->first();
         }

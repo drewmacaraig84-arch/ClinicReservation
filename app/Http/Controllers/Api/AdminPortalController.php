@@ -25,7 +25,10 @@ class AdminPortalController extends Controller
         $payload = ClinicCacheService::remember("admin_dashboard_{$statusFilter}_" . md5($search), 20, function () use ($statusFilter, $search) {
             $allAppointments = Appointment::with(['doctor.department', 'department'])
                 ->orderByDesc('appointment_date')
-                ->orderByRaw("CASE status WHEN 'serving' THEN 1 WHEN 'called' THEN 2 WHEN 'waiting' THEN 3 WHEN 'checked_in' THEN 4 WHEN 'pending' THEN 5 WHEN 'completed' THEN 6 ELSE 7 END")
+                ->orderByRaw(
+                    'CASE status WHEN ? THEN 1 WHEN ? THEN 2 WHEN ? THEN 3 WHEN ? THEN 4 WHEN ? THEN 5 WHEN ? THEN 6 ELSE 7 END',
+                    ['serving', 'called', 'waiting', 'checked_in', 'pending', 'completed']
+                )
                 ->orderBy('id')
                 ->get();
 
