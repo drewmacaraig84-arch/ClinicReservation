@@ -70,8 +70,8 @@ export const PORTAL_ROLE_DEFINITIONS = {
 };
 
 export function PortalLoginModal({ isOpen, onClose, onLoginSuccess, notify }) {
-    const [email, setEmail] = useState('sarah.johnson@carepoint.clinic');
-    const [password, setPassword] = useState('password123');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
     if (!isOpen) return null;
@@ -125,7 +125,7 @@ export function PortalLoginModal({ isOpen, onClose, onLoginSuccess, notify }) {
 
     return (
         <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+            <div className="bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full flex flex-col overflow-hidden">
                 {/* Header */}
                 <div className="bg-[#13467b] text-white px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
@@ -135,7 +135,7 @@ export function PortalLoginModal({ isOpen, onClose, onLoginSuccess, notify }) {
                                 Authorized Clinic Portal Sign In
                             </h3>
                             <p className="text-xs text-blue-200">
-                                Sign in to access Doctor, Staff / Reception, Queuing TV, Admin, or Super Admin portals
+                                Enter your authorized staff, physician, or administrator credentials
                             </p>
                         </div>
                     </div>
@@ -148,102 +148,45 @@ export function PortalLoginModal({ isOpen, onClose, onLoginSuccess, notify }) {
                     </button>
                 </div>
 
-                <div className="p-6 overflow-y-auto space-y-6">
+                <div className="p-6">
                     {/* Email & Password Form */}
-                    <form
-                        onSubmit={handleFormSubmit}
-                        className="bg-slate-50 rounded-xl p-5 border border-slate-200 space-y-4"
-                    >
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-1">
-                                    Portal Email Address
-                                </label>
-                                <input
-                                    type="email"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="name@carepoint.clinic"
-                                    className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm focus:border-[#13467b] focus:outline-none"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-1">
-                                    Password
-                                </label>
-                                <input
-                                    type="password"
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm focus:border-[#13467b] focus:outline-none"
-                                />
-                            </div>
+                    <form onSubmit={handleFormSubmit} className="space-y-4">
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                Portal Email Address
+                            </label>
+                            <input
+                                type="email"
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Enter your email address"
+                                className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm focus:border-[#13467b] focus:outline-none"
+                            />
                         </div>
-                        <div className="flex items-center justify-between flex-wrap gap-2">
-                            <span className="text-xs text-slate-500">
-                                Default demo password for all accounts: <code>password123</code>
-                            </span>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                Password
+                            </label>
+                            <input
+                                type="password"
+                                required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Enter your password"
+                                className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm focus:border-[#13467b] focus:outline-none"
+                            />
+                        </div>
+                        <div className="pt-2">
                             <button
                                 type="submit"
                                 disabled={submitting}
-                                className="px-6 py-2.5 rounded-lg bg-[#13467b] hover:bg-[#0e355e] text-white text-xs font-extrabold uppercase tracking-wide shadow-sm transition cursor-pointer"
+                                className="w-full py-3 rounded-xl bg-[#13467b] hover:bg-[#0e355e] text-white text-xs sm:text-sm font-extrabold uppercase tracking-wide shadow-sm transition cursor-pointer"
                             >
-                                {submitting ? 'Authenticating...' : 'Sign In to Portal →'}
+                                {submitting ? 'Authenticating...' : 'Sign In to Portal'}
                             </button>
                         </div>
                     </form>
-
-                    {/* Quick Role Portal Login Cards (Doctor, Staff, Queuing TV, Admin, Super Admin) */}
-                    <div>
-                        <div className="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-3">
-                            Or Click Any Authorized Role Account Below to Sign In Immediately:
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {Object.values(PORTAL_ROLE_DEFINITIONS).map((item) => {
-                                const Icon = item.icon;
-                                return (
-                                    <div
-                                        key={item.id}
-                                        className="rounded-xl border border-slate-200 hover:border-[#13467b] bg-white p-4 flex flex-col justify-between space-y-3 shadow-2xs transition"
-                                    >
-                                        <div className="space-y-1.5">
-                                            <div className="flex items-center justify-between">
-                                                <span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#13467b]">
-                                                    <Icon className="w-4 h-4 text-teal-600" />
-                                                    {item.name}
-                                                </span>
-                                            </div>
-                                            <div className="font-bold text-xs text-slate-900">
-                                                {item.accountName}
-                                            </div>
-                                            <div className="text-[11px] font-mono text-slate-500">
-                                                {item.email}
-                                            </div>
-                                            <p className="text-[11px] text-slate-600 leading-relaxed">
-                                                {item.description}
-                                            </p>
-                                        </div>
-
-                                        <button
-                                            type="button"
-                                            disabled={submitting}
-                                            onClick={() => {
-                                                setEmail(item.email);
-                                                setPassword('password123');
-                                                performLogin(item.email, 'password123', item.id);
-                                            }}
-                                            className="w-full py-2 px-3 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer"
-                                        >
-                                            <span>Login as {item.name}</span>
-                                            <ArrowRight className="w-3.5 h-3.5" />
-                                        </button>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
