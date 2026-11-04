@@ -4,11 +4,10 @@ import PortalSidebarNav from '../components/PortalSidebarNav';
 import WebsiteCmsEditor from '../components/WebsiteCmsEditor';
 import AccountManagerPanel from '../components/AccountManagerPanel';
 import { DashboardPortalSkeleton } from '../components/SkeletonLoaders';
-import { cachedFetchJson, invalidateClientCache } from '../utils/apiCache';
+import { cachedFetchJson, getRbacHeaders, invalidateClientCache } from '../utils/apiCache';
 import { broadcastWebsiteSettings } from '../utils/websiteConfig';
 import {
     LayoutDashboard,
-    SlidersHorizontal,
     Calendar,
     Settings,
     BarChart3,
@@ -93,10 +92,7 @@ export default function AdminPortal({
         try {
             const res = await fetch(`/api/v1/admin/appointments/${appointmentId}/action`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
+                headers: getRbacHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({ action }),
             });
             const json = await res.json();
@@ -119,10 +115,7 @@ export default function AdminPortal({
         try {
             const res = await fetch('/api/v1/admin/doctors', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
+                headers: getRbacHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({
                     ...newDoc,
                     department_id: Number(newDoc.department_id),
@@ -156,7 +149,7 @@ export default function AdminPortal({
         try {
             const res = await fetch(`/api/v1/admin/doctors/${docId}`, {
                 method: 'DELETE',
-                headers: { Accept: 'application/json' },
+                headers: getRbacHeaders(),
             });
             const json = await res.json();
             if (res.ok) {
@@ -174,10 +167,7 @@ export default function AdminPortal({
         try {
             const res = await fetch('/api/v1/admin/settings', {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
+                headers: getRbacHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({ ticker_news: tickerNews }),
             });
             const json = await res.json();
@@ -194,15 +184,15 @@ export default function AdminPortal({
         const rows = [
             ['Ticket No', 'Booking Ref', 'Patient Name', 'Department', 'Doctor', 'Date', 'Time', 'Status', 'Room'],
             ...(data?.appointments || []).map((a) => [
-                a.ticket_number,
-                a.booking_reference,
-                a.patient_name,
+                a.ticket_number || '',
+                a.booking_reference || '',
+                a.patient_name || '',
                 a.department?.name || '',
                 a.doctor?.name || '',
-                a.appointment_date?.slice(0, 10) || '',
-                a.appointment_time,
-                a.status,
-                a.assigned_room,
+                String(a.appointment_date || '').slice(0, 10),
+                a.appointment_time || '',
+                a.status || '',
+                a.assigned_room || '',
             ]),
         ];
         const csvContent = 'data:text/csv;charset=utf-8,' + rows.map((r) => r.join(',')).join('\n');
@@ -743,7 +733,7 @@ export default function AdminPortal({
                                                     <td className="py-3 px-3 text-amber-700 font-bold">{d.waiting}</td>
                                                     <td className="py-3 px-3 text-emerald-700 font-bold">{d.completed}</td>
                                                     <td className="py-3 px-3 font-black text-slate-900">
-                                                        ${d.revenue_generated.toFixed(2)}
+                                                        ₱{Number(d.revenue_generated || 0).toFixed(2)}
                                                     </td>
                                                 </tr>
                                             ))}

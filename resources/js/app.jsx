@@ -7,8 +7,6 @@ import DoctorPortal from './portals/DoctorPortal';
 import AdminPortal from './portals/AdminPortal';
 import SuperAdminPortal from './portals/SuperAdminPortal';
 import LegalAndConsentSuite from './components/LegalAndConsentSuite';
-import CarePointLogo from './components/CarePointLogo';
-import PortalSidebarNav from './components/PortalSidebarNav';
 import { PortalLoginModal } from './components/RbacSuite';
 import {
     getAuthSession,
@@ -31,9 +29,10 @@ function App() {
     const [toast, setToast] = useState(null);
 
     const notify = (message, type = 'success') => {
-        setToast({ message, type });
+        const id = Date.now() + Math.random();
+        setToast({ id, message, type });
         setTimeout(() => {
-            setToast((current) => (current?.message === message ? null : current));
+            setToast((current) => (current?.id === id ? null : current));
         }, 4500);
     };
 
@@ -52,9 +51,9 @@ function App() {
 
     const allowedPortals =
         authSession?.role === 'super_admin'
-            ? ['super_admin', 'admin']
+            ? ['super_admin', 'admin', 'client']
             : authSession?.defaultPortal
-              ? [authSession.defaultPortal]
+              ? [authSession.defaultPortal, 'client']
               : ['client'];
 
     const currentPortalToRender =

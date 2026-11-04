@@ -36,15 +36,22 @@ export function getActiveRole() {
 }
 
 export function getRbacHeaders(extraHeaders = {}) {
-    return {
+    const session = getAuthSession();
+    const headers = {
         Accept: 'application/json',
         'X-Active-Role': getActiveRole(),
         ...extraHeaders,
     };
+    if (session?.user?.id) {
+        headers['X-Active-User-Id'] = String(session.user.id);
+    }
+    return headers;
 }
 
 export function getCachedData(url) {
-    const roleScopedUrl = `${getActiveRole()}:${url}`;
+    const session = getAuthSession();
+    const userScope = session?.user?.id ? `u${session.user.id}:` : '';
+    const roleScopedUrl = `${getActiveRole()}:${userScope}${url}`;
     if (memoryCache.has(roleScopedUrl)) {
         return memoryCache.get(roleScopedUrl).data;
     }
@@ -64,7 +71,9 @@ export function getCachedData(url) {
 }
 
 export function setCachedData(url, data) {
-    const roleScopedUrl = `${getActiveRole()}:${url}`;
+    const session = getAuthSession();
+    const userScope = session?.user?.id ? `u${session.user.id}:` : '';
+    const roleScopedUrl = `${getActiveRole()}:${userScope}${url}`;
     const entry = { data, timestamp: Date.now() };
     memoryCache.set(roleScopedUrl, entry);
     try {
@@ -91,7 +100,7 @@ export function invalidateClientCache() {
 }
 
 /**
- * Fetches JSON with instant cache hydration (Stale-While-Revalidate) and RBAC role header.
+ * Fetches JSON with instant cache hydration (Stale-While-Revalidate), RBAC role header, and non-JSON crash guards.
  */
 export async function cachedFetchJson(url, onData, forceNetwork = false) {
     let servedFromCache = false;
@@ -103,15 +112,38 @@ export async function cachedFetchJson(url, onData, forceNetwork = false) {
         }
     }
 
-    const res = await fetch(url, {
-        headers: getRbacHeaders(),
-    });
-    const freshData = await res.json();
-    if (res.ok) {
+    let res;
+    try {
+        res = await fetch(url, {
+            headers: getRbacHeaders(),
+        });
+    } catch (netErr) {
+        if (!servedFromCache) {
+            throw new Error(netErr?.message || 'Network connection failed');
+        }
+        return { ok: false, status: 0, data: null };
+    }
+
+    let freshData = null;
+    try {
+        freshData = await res.json();
+    } catch (jsonErr) {
+        // Guard against non-JSON responses (e.g. 500 HTML crash page from hosting/proxy)
+        if (!res.ok && !servedFromCache) {
+            throw new Error(`Server returned HTTP ${res.status}`);
+        }
+    }
+
+    if (res.ok && freshData !== null) {
         setCachedData(url, freshData);
         onData(freshData, false);
-    } else if (!servedFromCache) {
-        throw new Error(freshData?.message || `HTTP ${res.status}`);
+    } else {
+        if (res.status === 401) {
+            clearAuthSession();
+        }
+        if (!servedFromCache) {
+            throw new Error(freshData?.message || `HTTP ${res.status}`);
+        }
     }
     return { ok: res.ok, status: res.status, data: freshData };
 }

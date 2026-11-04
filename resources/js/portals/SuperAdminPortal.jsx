@@ -12,8 +12,6 @@ import {
     Activity,
     Database,
     Terminal,
-    Trash2,
-    RotateCcw,
     RefreshCw,
     Globe,
     Users,
@@ -65,10 +63,7 @@ export default function SuperAdminPortal({
         try {
             const res = await fetch('/api/v1/super-admin/restore', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
+                headers: getRbacHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({ type, id }),
             });
             const json = await res.json();
@@ -87,14 +82,14 @@ export default function SuperAdminPortal({
     };
 
     const handleForceDelete = async (type, id) => {
+        if (!window.confirm(`Are you sure you want to PERMANENTLY purge this ${type} record? This action CANNOT be undone.`)) {
+            return;
+        }
         setBusy(true);
         try {
             const res = await fetch('/api/v1/super-admin/force-delete', {
                 method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
+                headers: getRbacHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({ type, id }),
             });
             const json = await res.json();
@@ -161,7 +156,7 @@ export default function SuperAdminPortal({
         try {
             const res = await fetch(`/api/v1/super-admin/logs/${logId}/resolve`, {
                 method: 'POST',
-                headers: { Accept: 'application/json' },
+                headers: getRbacHeaders(),
             });
             const json = await res.json();
             if (res.ok) {
@@ -179,10 +174,7 @@ export default function SuperAdminPortal({
         try {
             const res = await fetch('/api/v1/super-admin/simulate', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
+                headers: getRbacHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({ scenario }),
             });
             const json = await res.json();
@@ -387,7 +379,7 @@ export default function SuperAdminPortal({
                                     {health.resources?.disk_free_gb ?? 120} GB
                                 </div>
                                 <div className="text-[10px] text-slate-500 mt-0.5">
-                                    {health.resources?.disk_used_percent ?? 35}% utilized
+                                    {Math.max(1, Math.min(99, Math.round(health.resources?.disk_used_percent ?? 35)))}% utilized
                                 </div>
                             </div>
 

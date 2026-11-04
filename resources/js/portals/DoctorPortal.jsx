@@ -2,13 +2,11 @@ import React, { useState, useEffect } from 'react';
 import CarePointLogo from '../components/CarePointLogo';
 import PortalSidebarNav from '../components/PortalSidebarNav';
 import { DashboardPortalSkeleton } from '../components/SkeletonLoaders';
-import { cachedFetchJson, invalidateClientCache } from '../utils/apiCache';
+import { cachedFetchJson, getRbacHeaders, invalidateClientCache } from '../utils/apiCache';
 import {
-    Stethoscope,
     Users,
     Clock,
     UserCog,
-    CheckCircle2,
     Save,
 } from 'lucide-react';
 
@@ -111,6 +109,8 @@ export default function DoctorPortal({
     const handleSwitchDoctor = (newId) => {
         setSelectedDoctorId(newId);
         setActivePatient(null);
+        setDoctorNotes('');
+        setPrescription('');
         fetchDoctorPortal(newId, false);
     };
 
@@ -125,10 +125,7 @@ export default function DoctorPortal({
         try {
             const res = await fetch(`/api/v1/doctor/appointments/${appointmentId}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
+                headers: getRbacHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({
                     status: newStatus,
                     doctor_notes: doctorNotes,
@@ -153,14 +150,15 @@ export default function DoctorPortal({
 
     const handleSaveSchedule = async (e) => {
         e.preventDefault();
+        if (!selectedDoctorId) {
+            notify('No doctor profile selected.', 'error');
+            return;
+        }
         setSaving(true);
         try {
             const res = await fetch(`/api/v1/doctor/${selectedDoctorId}/schedule`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
+                headers: getRbacHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify(scheduleForm),
             });
             const json = await res.json();
@@ -180,14 +178,15 @@ export default function DoctorPortal({
 
     const handleSaveProfile = async (e) => {
         e.preventDefault();
+        if (!selectedDoctorId) {
+            notify('No doctor profile selected.', 'error');
+            return;
+        }
         setSaving(true);
         try {
             const res = await fetch(`/api/v1/doctor/${selectedDoctorId}/profile`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
+                headers: getRbacHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({
                     ...profileForm,
                     department_id: Number(profileForm.department_id),
