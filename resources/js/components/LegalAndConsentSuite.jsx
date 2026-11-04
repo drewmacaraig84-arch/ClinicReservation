@@ -172,8 +172,8 @@ export default function LegalAndConsentSuite({
                     <div className="w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden mb-1">
                         <div className="bg-[#13467b] text-white px-4 py-3 flex items-center justify-between">
                             <div>
-                                <div className="text-xs font-extrabold">CarePoint & HealthCube Concierge</div>
-                                <div className="text-[10px] text-blue-200">Online • Instant Patient Triage</div>
+                                <div className="text-xs font-extrabold">Labcure Lab Patient Concierge</div>
+                                <div className="text-[10px] text-blue-200">Calapan City, OrMin • Instant Patient Triage</div>
                             </div>
                             <button
                                 type="button"
@@ -185,7 +185,7 @@ export default function LegalAndConsentSuite({
                         </div>
                         <div className="p-4 space-y-3 text-xs bg-slate-50">
                             <div className="bg-white p-3 rounded-xl border border-slate-200 text-slate-700 shadow-2xs">
-                                👋 Hello! Welcome to CarePoint & HealthCube Medical Clinics. How can we assist you today?
+                                👋 Hello! Welcome to <strong>Labcure Laboratory & Medical Services Inc.</strong> (Calapan City, Oriental Mindoro). How can we assist you today?
                             </div>
                             <div className="space-y-1.5">
                                 <button
@@ -196,8 +196,16 @@ export default function LegalAndConsentSuite({
                                     }}
                                     className="w-full text-left px-3 py-2 rounded-lg bg-[#13467b] text-white font-bold hover:bg-[#0e355e] transition cursor-pointer"
                                 >
-                                    📅 Book a Doctor Appointment Now
+                                    📅 Book a Lab Test or Doctor Appointment
                                 </button>
+                                <a
+                                    href="https://www.facebook.com/LabcureLab"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="block w-full text-left px-3 py-2 rounded-lg bg-blue-50 border border-blue-200 text-[#13467b] font-bold hover:bg-blue-100 transition"
+                                >
+                                    💬 Message Us on Facebook (@LabcureLab)
+                                </a>
                                 <button
                                     type="button"
                                     onClick={() => {
@@ -208,8 +216,9 @@ export default function LegalAndConsentSuite({
                                 >
                                     🔒 View Data Privacy & Patient Rights
                                 </button>
-                                <div className="px-3 py-2 rounded-lg bg-teal-50 border border-teal-200 text-teal-900 font-semibold">
-                                    📞 Hotline: <strong>8652-1111</strong> | <strong>inquiry@healthcube.com.ph</strong>
+                                <div className="px-3 py-2 rounded-lg bg-teal-50 border border-teal-200 text-teal-900 font-semibold space-y-0.5">
+                                    <div>📞 <strong>0939-930-6575 / 0956-495-6174</strong></div>
+                                    <div className="text-[11px] break-all">✉️ <strong>labcurelaboratoryincorporated@gmail.com</strong></div>
                                 </div>
                             </div>
                         </div>
@@ -314,8 +323,8 @@ export default function LegalAndConsentSuite({
                                             1. Collection of Personal & Sensitive Health Information
                                         </div>
                                         <p className="text-xs text-slate-700">
-                                            When you book an appointment or generate a queue ticket at CarePoint /
-                                            HealthCube Medical Clinics, we collect only the necessary personal data:
+                                            When you book an appointment or generate a queue ticket at Labcure Laboratory &
+                                            Medical Services Inc., we collect only the necessary personal data:
                                             Full Name, Contact Number, Email Address, Age, Preferred Physician, Chief
                                             Complaint / Reason for Visit, and Clinical Consultation Notes recorded by
                                             your attending physician.
@@ -350,8 +359,8 @@ export default function LegalAndConsentSuite({
                                         </h5>
                                         <p className="text-xs">
                                             For data access, correction, or erasure requests, contact our Data
-                                            Protection Office at <strong>dpo@healthcube-carepoint.com.ph</strong> or call{' '}
-                                            <strong>(02) 8652-1111</strong>.
+                                            Protection Office at <strong>labcurelaboratoryincorporated@gmail.com</strong> or call{' '}
+                                            <strong>0939-930-6575 / 0956-495-6174</strong>.
                                         </p>
                                     </div>
                                 </div>
@@ -409,8 +418,8 @@ export default function LegalAndConsentSuite({
                                         Terms and Agreements — Clinic Reservation & Queue Service
                                     </h4>
                                     <p className="text-xs text-slate-600">
-                                        By scheduling an appointment or generating a queue ticket through CarePoint /
-                                        HealthCube Medical Clinics, you agree to the following terms:
+                                        By scheduling an appointment or generating a queue ticket through Labcure Laboratory &
+                                        Medical Services Inc., you agree to the following terms:
                                     </p>
                                     <ol className="list-decimal pl-5 space-y-2 text-xs">
                                         <li>
@@ -443,7 +452,7 @@ export default function LegalAndConsentSuite({
                             {activeModalTab === 'rights' && (
                                 <div className="space-y-4">
                                     <h4 className="text-lg font-extrabold text-slate-900">
-                                        Patient Bill of Rights, Senior/PWD Priority & HMO Accreditation
+                                        Patient Bill of Rights, Senior/PWD Priority & PhilHealth Konsulta / HMO Accreditation
                                     </h4>
                                     <ul className="list-disc pl-5 space-y-2 text-xs">
                                         <li>
@@ -452,10 +461,10 @@ export default function LegalAndConsentSuite({
                                             priority queue ordering at Reception Desk 1 and all diagnostic rooms.
                                         </li>
                                         <li>
-                                            <strong>Accredited HMO Partners:</strong> We accept major HMOs including
-                                            Maxicare, Medicard, Intellicare, PhilCare, Avega, Cocolife Healthcare,
-                                            ValuCare, and EastWest Healthcare. Please bring a valid government ID and
-                                            your physical or digital LOA.
+                                            <strong>PhilHealth Konsulta / YAKAP & HMO Partners:</strong> We are an accredited
+                                            PhilHealth Konsulta & YAKAP primary care provider and partner with major HMOs
+                                            and corporate wellness accounts. Please bring a valid government ID and your
+                                            PhilHealth ID or LOA.
                                         </li>
                                         <li>
                                             <strong>Right to Informed Consent & Confidentiality:</strong> Every patient
@@ -470,7 +479,7 @@ export default function LegalAndConsentSuite({
                         {/* Modal Footer */}
                         <div className="bg-slate-50 border-t border-slate-200 px-6 py-3.5 flex items-center justify-between">
                             <span className="text-xs text-slate-500">
-                                CarePoint & HealthCube Medical Clinics • Regulatory & Legal Affairs
+                                Labcure Laboratory & Medical Services Inc. • Calapan City, Oriental Mindoro
                             </span>
                             <button
                                 type="button"

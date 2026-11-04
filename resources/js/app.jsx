@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import ClientReservationPortal from './portals/ClientReservationPortal';
+import ClientReservationPortal from './portals/LabcureReservationPortal';
 import TvQueuePortal from './portals/TvQueuePortal';
 import StaffReceptionPortal from './portals/StaffReceptionPortal';
 import DoctorPortal from './portals/DoctorPortal';

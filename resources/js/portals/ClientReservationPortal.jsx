@@ -22,64 +22,107 @@ import {
     CreditCard,
     Sparkles,
     Clock,
+    ExternalLink,
 } from 'lucide-react';
+
+const FACEBOOK_PAGE_URL = 'https://www.facebook.com/LabcureLab';
 
 const SERVICES_DROPDOWN = [
     {
-        name: 'Laboratory',
-        desc: 'Complete blood chemistry, hematology, clinical microscopy & serology.',
-        turnaround: 'Same-Day Digital Results (2–6 Hours)',
-        prep: '8–12 hours fasting required for FBS and Lipid Profile.',
-        inclusions: ['Complete Blood Count (CBC)', 'Fasting Blood Sugar & HbA1c', 'Lipid Profile & Liver Enzymes', 'Urinalysis, Fecalysis & Serology'],
+        name: 'Clinical Laboratory',
+        desc: 'Complete blood chemistry, hematology, clinical microscopy, electrolytes & serology.',
+        turnaround: 'Same-Day Official Lab Results (2–6 Hours)',
+        prep: '8–12 hours fasting required for FBS and Lipid Profile (water is permitted).',
+        inclusions: [
+            'Complete Blood Count (CBC) with Platelet',
+            'Blood Chemistry (FBS, HbA1c, Lipid Profile, Creatinine, Uric Acid, SGPT/SGOT)',
+            'Routine Urinalysis & Fecalysis with Occult Blood',
+            'Serology, Thyroid Panel, HBsAg & Dengue NS1/IgG/IgM',
+        ],
     },
     {
-        name: 'Imaging',
-        desc: 'Digital X-Ray, 4D Ultrasound, Mammography & Low-Dose CT Scan.',
-        turnaround: '24-Hour Radiologist Official Reading',
-        prep: 'Full bladder for pelvic ultrasound; 6-hour fast for whole abdomen ultrasound.',
-        inclusions: ['Digital Chest & Skeletal X-Ray', 'Whole Abdomen & OB-GYN 4D Ultrasound', '3D Digital Mammography', 'Low-Dose Multi-Slice CT Scan'],
+        name: 'Imaging & Ultrasound',
+        desc: 'Digital X-Ray and diagnostic ultrasound with official radiologist interpretation.',
+        turnaround: 'Same-Day / 24-Hour Radiologist Reading',
+        prep: 'Full bladder for pelvic ultrasound; 6–8 hours fasting for whole abdomen ultrasound.',
+        inclusions: [
+            'Digital Chest X-Ray (PA / APL Views)',
+            'Skeletal & Extremity Digital X-Ray',
+            'Whole Abdomen, KUB, Hepatobiliary & Thyroid Ultrasound',
+            'OB-GYN & Pelvic Diagnostic Ultrasound',
+        ],
     },
     {
-        name: 'Cardiopulmonary',
-        desc: '12-Lead ECG, 2D Echo with Doppler, Treadmill Stress Test & Holter.',
-        turnaround: 'Immediate Tracings • Cardiologist Verified',
-        prep: 'Bring comfortable walking shoes/attire for Treadmill Stress Test.',
-        inclusions: ['12-Lead Resting ECG', '2D Echocardiography with Color Doppler', 'Treadmill Exercise Stress Test', '24-Hour Holter & ABPM Monitoring'],
+        name: 'Cardiopulmonary & ECG',
+        desc: '12-Lead resting Electrocardiogram (ECG) and cardiovascular screening.',
+        turnaround: 'Immediate Tracing • Specialist Verified',
+        prep: 'Rest for 10 minutes before tracing; avoid caffeine or smoking prior to ECG.',
+        inclusions: [
+            '12-Lead Resting Electrocardiogram (ECG)',
+            'Pre-Operative & Pre-Employment Cardiac Clearance',
+            'Hypertension & Cardiovascular Risk Profiling',
+            'Internal Medicine & Cardiology Referral Evaluation',
+        ],
     },
     {
-        name: 'Ambulatory Surgery',
-        desc: 'Outpatient minor surgical procedures and endoscopy suites.',
-        turnaround: 'Same-Day Outpatient Recovery',
-        prep: 'Pre-procedure surgical clearance and specialist consultation.',
-        inclusions: ['Excision of Minor Cysts & Lesions', 'Wound Debridement & Suturing', 'Upper GI Endoscopy & Colonoscopy', 'Outpatient Biopsy Procedures'],
-    },
-    {
-        name: 'Rehabilitation',
-        desc: 'Physical therapy, sports medicine & post-operative rehabilitation.',
-        turnaround: '60-Minute Personalized 1-on-1 Sessions',
-        prep: 'Wear loose, comfortable athletic clothing.',
-        inclusions: ['Post-Stroke & Orthopedic Rehab', 'Sports Injury Recovery Therapy', 'Therapeutic Ultrasound & TENS', 'Postural & Mobility Conditioning'],
+        name: 'PhilHealth Konsulta',
+        desc: 'Accredited PhilHealth Konsulta & YAKAP primary care consultations and diagnostics.',
+        turnaround: 'Accredited Primary Care Benefit Provider',
+        prep: 'Bring your PhilHealth ID / Member Data Record (MDR) and valid government ID.',
+        inclusions: [
+            'Free Primary Care Consultation for Registered Beneficiaries',
+            'Targeted Diagnostic Laboratory Tests under Konsulta Package',
+            'Preventive Health Risk Screening & Vital Signs',
+            'Essential Primary Care Medications & Follow-Up Care',
+        ],
     },
     {
         name: 'Vaccinations',
-        desc: 'Flu, Pneumonia, HPV, Hepatitis & Pediatric immunization packages.',
+        desc: 'Flu, Pneumococcal, Hepatitis B, Tetanus & corporate immunization programs.',
         turnaround: '15-Minute Physician Screening & Administration',
-        prep: 'Bring your previous immunization record card if available.',
-        inclusions: ['Quadrivalent Influenza (Flu) Vaccine', 'Pneumococcal (PCV13 / PPSV23)', 'HPV (Gardasil-9) & Hepatitis A/B', 'Tetanus, Rabies & Travel Vaccines'],
+        prep: 'Bring your previous immunization record or company endorsement if applicable.',
+        inclusions: [
+            'Quadrivalent Influenza (Flu) Vaccine',
+            'Pneumococcal Vaccine (PCV13 / PPSV23)',
+            'Hepatitis B & Tetanus Toxoid Immunization',
+            'On-Site Corporate & Institutional Vaccination Drives',
+        ],
     },
     {
-        name: 'Mental Health',
-        desc: 'Confidential psychiatric & psychological wellness consultations.',
-        turnaround: 'Strictly Confidential 45–60 Min Sessions',
-        prep: 'Available in-clinic at Mandaluyong & Greenhills or via private consultation.',
-        inclusions: ['Adult & Adolescent Psychiatry', 'Psychological Counseling & Therapy', 'Stress, Burnout & Sleep Management', 'Corporate Mental Wellness Assessments'],
+        name: 'Outpatient Consultations',
+        desc: 'Multispecialty consultations including Internal Medicine, Medical Oncology & General Medicine.',
+        turnaround: 'Scheduled & Walk-In Clinic Consultations',
+        prep: 'Bring previous laboratory results and current medication list for physician review.',
+        inclusions: [
+            'Internal Medicine & Adult Primary Care',
+            'Visiting Specialist Consultations (Medical Oncology, Pulmonology, Cardiology)',
+            'Medical Clearance & Fit-to-Work Certification',
+            'Chronic Disease Management (Diabetes, Hypertension, Thyroid)',
+        ],
     },
     {
-        name: 'Home Care',
-        desc: 'Home service blood extraction, ECG, and physician house calls.',
-        turnaround: 'Scheduled Morning Home Visits (Metro Manila)',
-        prep: 'Book at least 24 hours in advance for mobile phlebotomy.',
-        inclusions: ['Home Blood Extraction & Specimen Pickup', 'Portable 12-Lead Home ECG', 'Home Vaccination Administration', 'Senior Citizen Physician House Calls'],
+        name: 'Drug Testing & Clearance',
+        desc: 'DOH-accredited screening for pre-employment, LTO, school, and corporate compliance.',
+        turnaround: 'Fast-Track Official Biometric Result',
+        prep: 'Bring a valid government-issued photo ID for biometric verification.',
+        inclusions: [
+            'Standard Pre-Employment Drug Screening',
+            'Corporate Random & Annual Drug Testing',
+            'Student & Institutional Compliance Screening',
+            'Bundled Medical & Physical Clearance Certificate',
+        ],
+    },
+    {
+        name: 'Home & Mobile Lab',
+        desc: 'Scheduled home blood extraction and mobile on-site corporate laboratory services in Calapan.',
+        turnaround: 'Scheduled Morning Home Extraction (Calapan City)',
+        prep: 'Book at least 24 hours in advance via 0939-930-6575 or Facebook Messenger.',
+        inclusions: [
+            'Home Service Blood Extraction for Seniors & Bedridden Patients',
+            'Portable Home 12-Lead ECG Recording',
+            'On-Site Corporate Annual Physical Exam (APE) Mobile Team',
+            'Digital & Printed Official Result Delivery',
+        ],
     },
 ];
 
@@ -88,55 +131,55 @@ const CHECKUPS_DROPDOWN = [
         name: 'Executive Check-Up',
         price: '₱4,800',
         badge: 'Most Comprehensive',
-        desc: 'Comprehensive 42-parameter blood panel, ECG, Chest X-Ray, Ultrasound & Physician Evaluation.',
-        prep: '10–12 hours fasting (water is allowed). Morning schedule recommended.',
+        desc: 'Complete blood chemistry panel, CBC, Urinalysis, Fecalysis, 12-Lead ECG, Chest X-Ray, Ultrasound & Physician Evaluation.',
+        prep: '10–12 hours fasting (plain water is allowed). Morning schedule at Brgy. Lumangbayan is recommended.',
         inclusions: [
-            '42-Parameter Blood Chemistry (FBS, HbA1c, Lipid Profile, Kidney & Liver Function, Uric Acid, Electrolytes)',
-            'Complete Blood Count (CBC), Urinalysis & Fecalysis with Occult Blood',
+            'Comprehensive Blood Chemistry (FBS, HbA1c, Lipid Profile, Creatinine, BUN, Uric Acid, SGPT/SGOT, Electrolytes)',
+            'Complete Blood Count (CBC), Routine Urinalysis & Fecalysis',
             '12-Lead Resting ECG & Digital Chest X-Ray (PA View)',
             'Whole Abdomen Ultrasound',
-            'Comprehensive Physical Exam & Nutritional Review with Internal Medicine Specialist',
+            'Physical Examination & Comprehensive Result Interpretation by Clinic Physician',
         ],
     },
     {
         name: 'Annual Physical Exam',
         price: '₱1,650',
-        badge: 'Preventive Standard',
-        desc: 'CBC, Urinalysis, Fecalysis, Chest X-Ray, Visual Acuity & Medical Clearance.',
-        prep: 'No fasting required unless adding optional blood chemistry tests.',
+        badge: 'Corporate & Individual APE',
+        desc: 'CBC, Urinalysis, Fecalysis, Chest X-Ray, Visual Acuity, Physical Exam & Official Medical Clearance.',
+        prep: 'No fasting required unless adding Fasting Blood Sugar (FBS) or Lipid Profile.',
         inclusions: [
             'Complete History & Physical Examination by Clinic Physician',
             'Complete Blood Count (CBC) with Platelet Count',
             'Routine Urinalysis & Fecalysis',
             'Digital Chest X-Ray (PA View)',
-            'Visual Acuity, BMI & Blood Pressure Assessment + Official Medical Certificate',
+            'Vital Signs, BMI & Official Medical Fitness Certificate',
         ],
     },
     {
         name: 'Pre-Employment Medical Exam',
         price: '₱1,250',
-        badge: '24-Hour Fit-to-Work',
-        desc: 'Fast-track corporate onboarding medical exam with 24-hour digital fit-to-work certificate.',
+        badge: 'Fast Fit-to-Work',
+        desc: 'Fast-track onboarding medical exam for local companies, government agencies, and institutions in Oriental Mindoro.',
         prep: 'Bring valid government ID and company referral slip if applicable.',
         inclusions: [
             'Physical Examination & Medical History Review',
             'Complete Blood Count (CBC), Urinalysis & Fecalysis',
             'Digital Chest X-Ray',
-            'Optional Drug Testing & Hepatitis B Screening Add-On',
-            'Official Fit-to-Work Medical Clearance Certificate within 24 Hours',
+            'Optional Drug Testing & Hepatitis B (HBsAg) Screening Add-On',
+            'Official Fit-to-Work Medical Clearance Certificate',
         ],
     },
     {
         name: 'Pre-Enrollment Exam',
         price: '₱950',
         badge: 'Student Package',
-        desc: 'Student health screening, physical exam, and immunization review for schools & universities.',
-        prep: 'Bring school medical form for physician signature and stamp.',
+        desc: 'Student health screening, lab workup, and physical examination for schools, colleges & universities in Calapan City.',
+        prep: 'Bring your school medical form for official physician signature.',
         inclusions: [
             'Complete Student Physical Examination & Vital Signs',
             'Complete Blood Count (CBC), Urinalysis & Fecalysis',
             'Digital Chest X-Ray & Visual Acuity Check',
-            'Immunization Record Review & School Health Form Endorsement',
+            'Official School Medical Clearance Endorsement',
         ],
     },
 ];
@@ -147,59 +190,59 @@ const PATIENT_RESOURCES_DROPDOWN = [
 ];
 
 const HMO_PARTNERS_LIST = [
-    { name: 'Maxicare Healthcare', type: 'Full Outpatient, Lab & Imaging Coverage', loa: 'Instant Clinic Terminal & App E-LOA' },
-    { name: 'Medicard Philippines', type: 'Consultations, Executive Check-Ups & Diagnostics', loa: 'MACE App & Concierge Desk Approval' },
-    { name: 'Intellicare (Asalus)', type: 'Specialist Consultations & Diagnostic Procedures', loa: 'Agora App & HMO Desk 1 Verification' },
-    { name: 'PhilCare', type: 'Preventive Care, Lab Panels & X-Ray/Ultrasound', loa: 'HeyPhil App & Instant Clinic LOA' },
+    { name: 'PhilHealth Konsulta / YAKAP', type: 'Accredited Primary Care & Diagnostic Provider', loa: 'PhilHealth ID / MDR Verification at Reception' },
+    { name: 'EastWest Healthcare', type: 'Outpatient Consultations & Clinical Laboratory', loa: 'Direct Clinic LOA Verification' },
+    { name: 'Maxicare Healthcare', type: 'Outpatient Lab, X-Ray, Ultrasound & Consultations', loa: 'LOA & Corporate Health Endorsement' },
+    { name: 'Medicard Philippines', type: 'Consultations, Annual Physical Exams & Diagnostics', loa: 'Digital LOA & Reception Desk Processing' },
+    { name: 'Intellicare (Asalus)', type: 'Specialist Consultations & Diagnostic Procedures', loa: 'LOA Presentation at Reception Desk 1' },
+    { name: 'PhilCare', type: 'Preventive Care, Blood Chemistry & Imaging', loa: 'Digital LOA & Clinic Coordinator Approval' },
     { name: 'Cocolife Healthcare', type: 'Corporate & Individual Medical Plans', loa: 'Direct HMO Coordinator Verification' },
-    { name: 'Avega Managed Care', type: 'Outpatient Specialist & Diagnostic Services', loa: 'Digital LOA & Corporate Endorsement' },
-    { name: 'ValuCare Health Systems', type: 'Primary & Specialist Clinic Consultations', loa: 'On-Site HMO Verification Desk' },
-    { name: 'EastWest Healthcare', type: 'Comprehensive Outpatient & Laboratory Care', loa: 'Direct Clinic LOA Processing' },
+    { name: 'Government & Corporate Partners', type: 'NIA, Judiciary & Institutional Wellness Accounts', loa: 'Agency Referral Slip / Official Endorsement' },
 ];
 
 const DISCOUNT_CARDS_LIST = [
     {
-        title: 'HealthCube Prestige Wellness Card',
-        discount: '15% OFF Diagnostics & 10% OFF Packages',
-        desc: 'Exclusive loyalty card for individuals and families offering year-round discounts on laboratory tests, imaging, and executive check-ups.',
+        title: 'PhilHealth Konsulta / YAKAP Benefit',
+        discount: 'Covered Primary Care & Lab Package',
+        desc: 'Labcure Laboratory and Medical Services Inc. is an accredited PhilHealth Konsulta provider in Calapan City offering covered primary care consultations and targeted diagnostics.',
     },
     {
         title: 'Senior Citizen Privilege (RA 9994)',
         discount: '20% Discount + 12% VAT Exemption',
-        desc: 'Honored across all consultations, laboratory workups, diagnostic imaging, and medical procedures upon presentation of OSCA ID.',
+        desc: 'Honored across all consultations, clinical laboratory tests, X-ray, ultrasound, and ECG upon presentation of a valid Senior Citizen / OSCA ID.',
     },
     {
         title: 'Persons with Disability (PWD - RA 10754)',
         discount: '20% Discount + 12% VAT Exemption',
-        desc: 'Dedicated priority lane access and statutory discounts on all medical and diagnostic services.',
+        desc: 'Dedicated priority queue lane access and statutory discounts on all laboratory and medical services.',
     },
     {
-        title: 'Corporate Partner Wellness Card',
-        discount: 'Custom Corporate Rates',
-        desc: 'Special preferred rates for employees and dependents of our 150+ accredited corporate partner organizations.',
+        title: 'Corporate & Institutional Partner Rates',
+        discount: 'Preferred Group & Agency Packages',
+        desc: 'Custom discounted rates for annual physical exams, pre-employment testing, and flu/pneumococcal vaccination programs for partner offices and schools in Oriental Mindoro.',
     },
 ];
 
 const FAQS = [
     {
-        q: 'Is parking available at the Shaw and Greenhills branch?',
-        a: 'Yes! Dedicated patient parking slots are available right in front of our 241 Shaw Blvd (Mandaluyong) facility, and ample multi-level mall parking is available at the 5th Floor, GH Mall, Greenhills Commercial Complex (San Juan).',
+        q: 'Where is Labcure Laboratory and Medical Services Inc. located?',
+        a: 'We are located at the A2RD Commercial Building, Dama de Noche Street, Barangay Lumangbayan, Calapan City, 5200 Oriental Mindoro (accessible along the Lumangbayan medical corridor).',
     },
     {
-        q: 'Do you perform both walk-in and online scheduled exams?',
-        a: 'Yes. Online reservations enjoy priority check-in at Reception Desk 1 with an instant digital queue ticket (e.g., G-105), while walk-in patients can generate a ticket at our Reception Kiosk.',
+        q: 'What are your clinic and laboratory operating hours?',
+        a: 'Our clinical laboratory and diagnostic facility is open Monday to Saturday starting at 7:00 AM. Visiting specialist physicians hold scheduled morning and afternoon clinic blocks—you can book online or call 0939-930-6575 / 0956-495-6174 to confirm your doctor’s exact hours.',
     },
     {
-        q: 'Which HMO partners and discount cards are accredited?',
-        a: 'We are accredited with Maxicare, Medicard, Intellicare, PhilCare, Avega, Cocolife Healthcare, ValuCare, and EastWest Healthcare. We also honor Senior Citizen, PWD, and HealthCube Prestige Discount Cards.',
+        q: 'Are you an accredited PhilHealth Konsulta / YAKAP provider?',
+        a: 'Yes! Labcure Laboratory and Medical Services Inc. is an officially accredited PhilHealth Konsulta provider in Calapan City, Oriental Mindoro. Bring your PhilHealth ID or Member Data Record (MDR) to avail of your primary care and diagnostic benefits.',
     },
     {
-        q: 'How is my personal health data protected?',
-        a: 'All personal and clinical information is protected under the Data Privacy Act of 2012 (RA 10173) and HIPAA security standards, utilizing encrypted database storage, WAF input sanitization, and strict access controls.',
+        q: 'How do I prepare for a Fasting Blood Sugar (FBS) or Lipid Profile test?',
+        a: 'Please fast for 8 to 12 hours prior to your morning blood extraction (plain water is allowed). Avoid alcoholic beverages and heavy meals at least 24 hours before your test.',
     },
     {
-        q: 'How do I prepare for an Executive Check-Up or fasting blood test?',
-        a: 'Please fast for 10 to 12 hours prior to your morning appointment (plain water is permitted). Avoid alcoholic beverages 24 hours before your laboratory extraction.',
+        q: 'How can I reach Labcure Lab for results, home service, or corporate packages?',
+        a: 'You can call or text us at 0939-930-6575 or 0956-495-6174, email labcurelaboratoryincorporated@gmail.com, or message our official Facebook page at facebook.com/LabcureLab (Labcure Lab Calapan OrMin).',
     },
 ];
 
@@ -219,7 +262,7 @@ function resolvePageFromLocation() {
     return 'home';
 }
 
-export default function ClientReservationPortal({
+export default function LabcureReservationPortal({
     onSwitchPortal,
     onOpenLoginModal,
     notify,
@@ -487,20 +530,29 @@ export default function ClientReservationPortal({
             {/* 1. TOP ROYAL-BLUE UTILITY BAR */}
             <div className="bg-[#13467b] text-white text-xs">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-5 flex-wrap">
+                    <div className="flex items-center gap-4 sm:gap-5 flex-wrap">
                         <a
-                            href="mailto:inquiry@healthcube.com.ph"
+                            href="mailto:labcurelaboratoryincorporated@gmail.com"
                             className="inline-flex items-center gap-1.5 hover:text-cyan-200 transition font-medium"
                         >
                             <Mail className="w-3.5 h-3.5" />
-                            <span>inquiry@healthcube.com.ph</span>
+                            <span>labcurelaboratoryincorporated@gmail.com</span>
                         </a>
                         <a
-                            href="tel:86521111"
+                            href="tel:09399306575"
                             className="inline-flex items-center gap-1.5 hover:text-cyan-200 transition font-semibold"
                         >
                             <Phone className="w-3.5 h-3.5" />
-                            <span>8652-1111</span>
+                            <span>0939-930-6575 / 0956-495-6174</span>
+                        </a>
+                        <a
+                            href={FACEBOOK_PAGE_URL}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 text-sky-200 hover:text-white transition font-semibold"
+                        >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            <span>FB: Labcure Lab Calapan OrMin</span>
                         </a>
                     </div>
 
@@ -547,11 +599,11 @@ export default function ClientReservationPortal({
                         <CarePointLogo size="md" />
                         <span className="hidden sm:inline-block h-6 w-px bg-slate-200" />
                         <div className="hidden sm:block leading-tight">
-                            <div className="text-sm font-black tracking-tight text-[#13467b]">
-                                HealthCube
+                            <div className="text-xs font-black tracking-tight text-[#13467b]">
+                                Calapan City, OrMin
                             </div>
-                            <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                                Medical Clinics
+                            <div className="text-[10px] font-bold uppercase tracking-widest text-teal-700">
+                                PhilHealth Konsulta Accredited
                             </div>
                         </div>
                     </div>
@@ -726,7 +778,7 @@ export default function ClientReservationPortal({
                                     <div className="space-y-1">
                                         <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-800">
                                             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                                            Appointment Confirmed & Added to Clinic Queue
+                                            Appointment Confirmed & Added to Labcure Clinic Queue
                                         </div>
                                         <h3 className="text-xl font-extrabold text-slate-900">
                                             Ticket No:{' '}
@@ -760,10 +812,10 @@ export default function ClientReservationPortal({
                             <div className="flex flex-wrap items-center justify-between gap-2 pb-5 border-b border-slate-100">
                                 <div>
                                     <h2 className="text-xl font-extrabold text-slate-900">
-                                        Book an Appointment
+                                        Book an Appointment — Labcure Lab Calapan
                                     </h2>
                                     <p className="text-xs text-slate-500 mt-0.5">
-                                        Choose your department, specialist doctor, preferred date, and real-time slot.
+                                        Choose your department, specialist doctor, preferred date, and real-time slot at A2RD Bldg, Dama de Noche St., Calapan City.
                                     </p>
                                 </div>
                             </div>
@@ -852,7 +904,7 @@ export default function ClientReservationPortal({
                                             onChange={(e) => setPriority(e.target.value)}
                                             className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-800 shadow-2xs focus:border-teal-600 focus:outline-none"
                                         >
-                                            <option value="normal">Standard Consultation</option>
+                                            <option value="normal">Standard Consultation / Diagnostic</option>
                                             <option value="senior_pwd">
                                                 Senior Citizen / PWD / Pregnant Priority
                                             </option>
@@ -915,7 +967,7 @@ export default function ClientReservationPortal({
                                                 required
                                                 value={patientName}
                                                 onChange={(e) => setPatientName(e.target.value)}
-                                                placeholder="e.g. John Doe"
+                                                placeholder="e.g. Juan Dela Cruz"
                                                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none"
                                             />
                                         </div>
@@ -928,7 +980,7 @@ export default function ClientReservationPortal({
                                                 required
                                                 value={patientPhone}
                                                 onChange={(e) => setPatientPhone(e.target.value)}
-                                                placeholder="e.g. +63 917 555 0199"
+                                                placeholder="e.g. 0939 930 6575"
                                                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none"
                                             />
                                         </div>
@@ -969,7 +1021,7 @@ export default function ClientReservationPortal({
                                                 type="text"
                                                 value={reasonForVisit}
                                                 onChange={(e) => setReasonForVisit(e.target.value)}
-                                                placeholder="e.g. General consultation, Executive Check-Up, Annual Physical Exam..."
+                                                placeholder="e.g. Clinical Laboratory, PhilHealth Konsulta, Executive Check-Up..."
                                                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none"
                                             />
                                         </div>
@@ -985,7 +1037,7 @@ export default function ClientReservationPortal({
                                         />
                                         <label htmlFor="consent-checkbox" className="leading-relaxed">
                                             I consent to the collection and processing of my personal and medical
-                                            appointment data in accordance with the{' '}
+                                            appointment data by Labcure Laboratory & Medical Services Inc. in accordance with the{' '}
                                             <button
                                                 type="button"
                                                 onClick={() => onOpenLegalModal('privacy')}
@@ -1043,14 +1095,14 @@ export default function ClientReservationPortal({
                         <div className="bg-gradient-to-r from-[#13467b] to-teal-800 rounded-2xl p-8 text-white flex flex-wrap items-center justify-between gap-6">
                             <div className="max-w-2xl space-y-2">
                                 <span className="text-xs font-extrabold uppercase tracking-widest text-teal-200">
-                                    CLINICAL & DIAGNOSTIC DEPARTMENTS
+                                    LABCURE LABORATORY & MEDICAL SERVICES INC.
                                 </span>
                                 <h1 className="text-2xl sm:text-4xl font-black tracking-tight">
-                                    Our Comprehensive Medical Services
+                                    Clinical Laboratory & Medical Services
                                 </h1>
                                 <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-                                    Explore our 8 specialized diagnostic and therapeutic departments equipped with automated
-                                    laboratory analyzers, low-dose imaging, and board-certified clinicians.
+                                    Explore our diagnostic laboratory, digital X-ray, ultrasound, 12-lead ECG, PhilHealth
+                                    Konsulta primary care, and specialist outpatient services in Calapan City, Oriental Mindoro.
                                 </p>
                             </div>
                             <button
@@ -1135,7 +1187,7 @@ export default function ClientReservationPortal({
 
                                     <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                                         <span className="text-xs text-slate-500 font-medium">
-                                            Available at Shaw Blvd & Greenhills
+                                            Brgy. Lumangbayan, Calapan City
                                         </span>
                                         <button
                                             type="button"
@@ -1159,14 +1211,14 @@ export default function ClientReservationPortal({
                         <div className="bg-gradient-to-r from-slate-900 via-[#13467b] to-teal-900 rounded-2xl p-8 text-white flex flex-wrap items-center justify-between gap-6">
                             <div className="max-w-2xl space-y-2">
                                 <span className="text-xs font-extrabold uppercase tracking-widest text-teal-200">
-                                    PREVENTIVE WELLNESS & EXECUTIVE PACKAGES
+                                    PREVENTIVE WELLNESS & DIAGNOSTIC BUNDLES
                                 </span>
                                 <h1 className="text-2xl sm:text-4xl font-black tracking-tight">
                                     Medical Check-Up Packages
                                 </h1>
                                 <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-                                    Proactive health screening packages tailored for executives, annual wellness, corporate
-                                    pre-employment onboarding, and university enrollment clearances.
+                                    Comprehensive diagnostic check-ups tailored for executives, annual physical exams (APE),
+                                    pre-employment onboarding, and student medical clearances in Oriental Mindoro.
                                 </p>
                             </div>
                             <button
@@ -1260,11 +1312,11 @@ export default function ClientReservationPortal({
                                     PATIENT RESOURCES & ACCREDITATIONS
                                 </span>
                                 <h1 className="text-2xl sm:text-4xl font-black tracking-tight">
-                                    HMO Partners & Discount Cards
+                                    PhilHealth Konsulta, HMO Partners & Privileges
                                 </h1>
                                 <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-                                    Enjoy cashless medical consultations, laboratory workups, and imaging with our accredited
-                                    HMO providers, or avail exclusive savings with our privilege and statutory discount cards.
+                                    Labcure Laboratory and Medical Services Inc. is an accredited PhilHealth Konsulta / YAKAP
+                                    provider and partners with leading HMOs and corporate institutions in Oriental Mindoro.
                                 </p>
                             </div>
                             <button
@@ -1272,17 +1324,17 @@ export default function ClientReservationPortal({
                                 onClick={() => openSchedulePage()}
                                 className="px-6 py-3 rounded-xl bg-teal-400 hover:bg-teal-300 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wide shadow-lg cursor-pointer"
                             >
-                                Book with HMO / Card
+                                Book with Konsulta / HMO
                             </button>
                         </div>
 
                         <div className="space-y-5">
                             <div>
                                 <div className="text-xs font-extrabold uppercase tracking-widest text-teal-700">
-                                    CASHLESS MEDICAL COVERAGE
+                                    ACCREDITED HEALTH COVERAGE
                                 </div>
                                 <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">
-                                    Accredited HMO Partners
+                                    PhilHealth Konsulta & Accredited HMO Partners
                                 </h2>
                             </div>
 
@@ -1301,7 +1353,7 @@ export default function ClientReservationPortal({
                                             <p className="text-xs text-slate-600">{hmo.type}</p>
                                         </div>
                                         <div className="pt-2 border-t border-slate-100 text-[11px] font-semibold text-slate-500">
-                                            LOA Processing: <span className="text-slate-800">{hmo.loa}</span>
+                                            Verification: <span className="text-slate-800">{hmo.loa}</span>
                                         </div>
                                     </div>
                                 ))}
@@ -1345,18 +1397,46 @@ export default function ClientReservationPortal({
             {activePage === 'about' && (
                 <section className="py-12 bg-white border-b border-slate-200 flex-1">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
-                        <div className="bg-gradient-to-r from-slate-900 via-[#13467b] to-teal-900 rounded-2xl p-8 sm:p-10 text-white space-y-4">
-                            <span className="text-xs font-extrabold uppercase tracking-widest text-teal-300">
-                                ABOUT HEALTHCUBE & CAREPOINT MEDICAL CLINICS
-                            </span>
-                            <h1 className="text-2xl sm:text-4xl font-black tracking-tight max-w-3xl">
-                                Precision. Innovation. Trusted Multispecialty Healthcare.
-                            </h1>
-                            <p className="text-xs sm:text-base text-slate-200 leading-relaxed max-w-3xl">
-                                Founded with a vision to redefine outpatient healthcare in Metro Manila, HealthCube &
-                                CarePoint Medical Clinics bring together board-certified specialists, hospital-grade
-                                diagnostic imaging, and automated laboratory medicine under one roof.
-                            </p>
+                        <div className="bg-gradient-to-r from-slate-900 via-[#13467b] to-teal-900 rounded-2xl p-8 sm:p-10 text-white flex flex-wrap items-center justify-between gap-8">
+                            <div className="space-y-4 max-w-2xl">
+                                <span className="text-xs font-extrabold uppercase tracking-widest text-teal-300">
+                                    ABOUT LABCURE LABORATORY & MEDICAL SERVICES INC.
+                                </span>
+                                <h1 className="text-2xl sm:text-4xl font-black tracking-tight">
+                                    Trusted Clinical Laboratory & Multispecialty Care in Calapan City
+                                </h1>
+                                <p className="text-xs sm:text-base text-slate-200 leading-relaxed">
+                                    Located at A2RD Commercial Building, Dama de Noche Street, Brgy. Lumangbayan, Calapan City,
+                                    Oriental Mindoro, <strong>Labcure Laboratory and Medical Services Inc.</strong> provides
+                                    accurate outpatient diagnostic testing, PhilHealth Konsulta primary care, and specialist
+                                    medical consultations for individuals, families, and partner institutions.
+                                </p>
+                                <div className="pt-2 flex flex-wrap gap-3">
+                                    <a
+                                        href={FACEBOOK_PAGE_URL}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-[#13467b] font-extrabold text-xs sm:text-sm shadow-md hover:bg-blue-50 transition"
+                                    >
+                                        <span>Visit Official Facebook Page (@LabcureLab)</span>
+                                        <ExternalLink className="w-4 h-4" />
+                                    </a>
+                                    <button
+                                        type="button"
+                                        onClick={() => openSchedulePage()}
+                                        className="px-5 py-2.5 rounded-xl bg-teal-400 hover:bg-teal-300 text-slate-950 font-black text-xs sm:text-sm cursor-pointer"
+                                    >
+                                        Schedule an Appointment
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-white p-2 shadow-2xl shrink-0 mx-auto">
+                                <img
+                                    src="/labcure-logo.jpg"
+                                    alt="Labcure Laboratory Inc. & Medical Services"
+                                    className="w-full h-full object-cover rounded-full"
+                                />
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1366,8 +1446,8 @@ export default function ClientReservationPortal({
                                 </div>
                                 <h3 className="text-lg font-black text-slate-900">Our Mission</h3>
                                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                                    To deliver accessible, compassionate, and evidence-based medical care empowered by
-                                    modern diagnostic precision and seamless digital patient experiences.
+                                    To deliver accessible, accurate, and compassionate diagnostic laboratory and primary care
+                                    services to the people of Calapan City and Oriental Mindoro.
                                 </p>
                             </div>
 
@@ -1377,8 +1457,8 @@ export default function ClientReservationPortal({
                                 </div>
                                 <h3 className="text-lg font-black text-slate-900">Our Vision</h3>
                                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                                    To be the most trusted multispecialty ambulatory and diagnostic clinic network in the
-                                    Philippines, setting the benchmark for clinical quality and patient safety.
+                                    To be Oriental Mindoro’s premier outpatient diagnostic laboratory and multispecialty
+                                    medical clinic known for clinical integrity, fast turnaround times, and patient-centered care.
                                 </p>
                             </div>
 
@@ -1386,10 +1466,10 @@ export default function ClientReservationPortal({
                                 <div className="p-2.5 rounded-xl bg-[#13467b] text-white w-fit">
                                     <Building2 className="w-5 h-5" />
                                 </div>
-                                <h3 className="text-lg font-black text-slate-900">Clinical Research & Quality</h3>
+                                <h3 className="text-lg font-black text-slate-900">PhilHealth Konsulta & DOH Standards</h3>
                                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                                    DOH-licensed and NEQAS-participating clinical laboratories adhering to international
-                                    quality assurance protocols, RA 10173 Data Privacy, and HIPAA security safeguards.
+                                    Accredited under PhilHealth Konsulta / YAKAP and compliant with Department of Health (DOH)
+                                    clinical laboratory standards and RA 10173 Data Privacy safeguards.
                                 </p>
                             </div>
                         </div>
@@ -1397,26 +1477,40 @@ export default function ClientReservationPortal({
                         <div className="bg-slate-900 text-white rounded-2xl p-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                             <div className="space-y-3">
                                 <span className="text-xs font-bold uppercase tracking-widest text-teal-400">
-                                    OUR METRO MANILA FACILITIES
+                                    OUR CALAPAN CITY FACILITY
                                 </span>
-                                <h2 className="text-2xl font-black">Visit Our Clinic Branches</h2>
+                                <h2 className="text-2xl font-black">Visit Labcure Laboratory Inc.</h2>
                                 <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                                    Both branches feature full laboratory, imaging, cardiopulmonary, and multispecialty
-                                    consultation suites open Monday to Saturday from 7:00 AM to 5:00 PM.
+                                    Conveniently located in Barangay Lumangbayan, Calapan City, featuring automated blood
+                                    chemistry and hematology analyzers, digital imaging, ECG, and specialist consultation rooms.
                                 </p>
                             </div>
                             <div className="space-y-4 text-xs sm:text-sm">
                                 <div className="p-4 rounded-xl bg-slate-800/90 border border-slate-700 space-y-1">
-                                    <div className="font-extrabold text-teal-300">Shaw Boulevard Main Facility</div>
-                                    <div className="text-slate-200">241 Shaw Blvd, Mandaluyong, 1552 Metro Manila</div>
-                                    <div className="text-slate-400 text-xs">Dedicated Street-Level Patient Parking</div>
+                                    <div className="font-extrabold text-teal-300">Main Clinic & Diagnostic Laboratory</div>
+                                    <div className="text-slate-200">
+                                        A2RD Commercial Building, Dama de Noche Street, Brgy. Lumangbayan, Calapan City, 5200 Oriental Mindoro
+                                    </div>
+                                    <div className="text-slate-400 text-xs">
+                                        Open Monday – Saturday • Starting at 7:00 AM
+                                    </div>
                                 </div>
                                 <div className="p-4 rounded-xl bg-slate-800/90 border border-slate-700 space-y-1">
-                                    <div className="font-extrabold text-teal-300">Greenhills Mall Branch</div>
+                                    <div className="font-extrabold text-teal-300">Direct Contact & Facebook Page</div>
                                     <div className="text-slate-200">
-                                        5th Floor, GH Mall, Greenhills Comml Complex, San Juan, 1500 Metro Manila
+                                        Mobile: 0939-930-6575 / 0956-495-6174 • Email: labcurelaboratoryincorporated@gmail.com
                                     </div>
-                                    <div className="text-slate-400 text-xs">Direct Multi-Level Mall Parking Access</div>
+                                    <div>
+                                        <a
+                                            href={FACEBOOK_PAGE_URL}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="text-sky-300 hover:underline text-xs font-bold inline-flex items-center gap-1"
+                                        >
+                                            <span>https://www.facebook.com/LabcureLab</span>
+                                            <ExternalLink className="w-3 h-3" />
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1431,7 +1525,7 @@ export default function ClientReservationPortal({
                             <div className="flex flex-wrap items-end justify-between gap-4">
                                 <div>
                                     <div className="text-xs font-extrabold uppercase tracking-widest text-teal-700">
-                                        BOARD-CERTIFIED SPECIALISTS DIRECTORY
+                                        LABCURE MEDICAL SPECIALISTS DIRECTORY
                                     </div>
                                     <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
                                         Find A Doctor & Check Live Room Availability
@@ -1453,7 +1547,7 @@ export default function ClientReservationPortal({
                                         type="text"
                                         value={doctorSearch}
                                         onChange={(e) => setDoctorSearch(e.target.value)}
-                                        placeholder="Search doctor by name, specialty, or room (e.g. Sarah Johnson, Cardiology, ROOM 1)..."
+                                        placeholder="Search doctor by name, specialty, or room (e.g. Internal Medicine, Cardiology, ROOM 1)..."
                                         className="w-full rounded-xl border border-slate-300 pl-10 pr-4 py-2.5 text-sm focus:border-[#13467b] focus:outline-none"
                                     />
                                 </div>
@@ -1578,18 +1672,31 @@ export default function ClientReservationPortal({
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                             <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-1.5">
                                 <Phone className="w-5 h-5 text-[#13467b]" />
-                                <div className="font-black text-sm text-slate-900">Patient Hotline</div>
-                                <div className="text-xs text-slate-600">8652-1111 / +1 (800) 555-0199</div>
+                                <div className="font-black text-sm text-slate-900">Mobile / Hotline</div>
+                                <div className="text-xs text-slate-600">0939-930-6575 / 0956-495-6174</div>
                             </div>
                             <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-1.5">
                                 <Mail className="w-5 h-5 text-[#13467b]" />
-                                <div className="font-black text-sm text-slate-900">Email Inquiries</div>
-                                <div className="text-xs text-slate-600">inquiry@healthcube.com.ph</div>
+                                <div className="font-black text-sm text-slate-900">Email & Facebook</div>
+                                <div className="text-xs text-slate-600 break-all">
+                                    labcurelaboratoryincorporated@gmail.com
+                                </div>
+                                <a
+                                    href={FACEBOOK_PAGE_URL}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex items-center gap-1 text-xs font-bold text-[#13467b] hover:underline"
+                                >
+                                    <span>facebook.com/LabcureLab</span>
+                                    <ExternalLink className="w-3 h-3" />
+                                </a>
                             </div>
                             <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-1.5">
                                 <MapPin className="w-5 h-5 text-[#13467b]" />
-                                <div className="font-black text-sm text-slate-900">Clinic Branches</div>
-                                <div className="text-xs text-slate-600">241 Shaw Blvd & 5F GH Mall Greenhills</div>
+                                <div className="font-black text-sm text-slate-900">Calapan City Address</div>
+                                <div className="text-xs text-slate-600">
+                                    A2RD Bldg, Dama de Noche St., Brgy. Lumangbayan, Calapan City, Oriental Mindoro
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1602,14 +1709,15 @@ export default function ClientReservationPortal({
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 lg:py-20 relative z-10 text-center max-w-3xl space-y-5">
                             <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold uppercase tracking-wider text-teal-200 border border-white/20">
                                 <Sparkles className="w-3.5 h-3.5" />
-                                Seamless, Personalized Healthcare Designed to Empower You
+                                Labcure Laboratory & Medical Services Inc. • Calapan City, Oriental Mindoro
                             </span>
                             <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
-                                Your Health Needs, All in One Place
+                                Your Health & Diagnostic Needs, All in One Place
                             </h1>
                             <p className="text-sm sm:text-base text-slate-200 leading-relaxed">
-                                Experience healthcare designed for your lifestyle. CarePoint & HealthCube Medical Clinics offer
-                                comprehensive medical consultations, executive check-ups, and advanced diagnostics.
+                                Trusted outpatient clinical laboratory, digital X-ray, ultrasound, 12-lead ECG, PhilHealth
+                                Konsulta primary care, and specialist consultations at Dama de Noche St., Brgy. Lumangbayan,
+                                Calapan City.
                             </p>
                             <div className="pt-2 flex flex-wrap items-center justify-center gap-3.5">
                                 <button
@@ -1626,6 +1734,15 @@ export default function ClientReservationPortal({
                                 >
                                     Explore All Services
                                 </button>
+                                <a
+                                    href={FACEBOOK_PAGE_URL}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="px-5 py-3 rounded-lg bg-white/10 hover:bg-white/20 border border-white/25 text-white font-bold text-xs sm:text-sm inline-flex items-center gap-1.5 transition"
+                                >
+                                    <span>Facebook Page (@LabcureLab)</span>
+                                    <ExternalLink className="w-3.5 h-3.5" />
+                                </a>
                             </div>
                         </div>
                     </section>
@@ -1793,11 +1910,11 @@ export default function ClientReservationPortal({
                                         ABOUT US
                                     </span>
                                     <h3 className="text-xl font-black text-slate-900">
-                                        Precision. Innovation. Trusted Results.
+                                        Labcure Lab Calapan OrMin
                                     </h3>
                                     <p className="text-xs text-slate-600 leading-relaxed">
-                                        Discover our mission, vision, DOH-accredited diagnostic facilities, and our
-                                        Mandaluyong (Shaw Blvd) and San Juan (Greenhills) clinic branches.
+                                        Discover our mission, vision, PhilHealth Konsulta accreditation, and our facility at
+                                        A2RD Commercial Building, Dama de Noche St., Brgy. Lumangbayan, Calapan City.
                                     </p>
                                 </div>
                                 <button
@@ -1816,11 +1933,11 @@ export default function ClientReservationPortal({
                                         PATIENT RESOURCES
                                     </span>
                                     <h3 className="text-xl font-black text-slate-900">
-                                        HMO Partners & Discount Cards
+                                        PhilHealth Konsulta, HMOs & Discounts
                                     </h3>
                                     <p className="text-xs text-slate-600 leading-relaxed">
-                                        Accredited with Maxicare, Medicard, Intellicare, PhilCare, Cocolife, Avega,
-                                        ValuCare, Senior/PWD privileges, and HealthCube Prestige Cards.
+                                        Accredited with PhilHealth Konsulta / YAKAP, EastWest Healthcare, Maxicare, Medicard,
+                                        Intellicare, PhilCare, Cocolife, and Senior/PWD statutory privileges.
                                     </p>
                                 </div>
                                 <button
@@ -1839,11 +1956,11 @@ export default function ClientReservationPortal({
                                         FAQS & SUPPORT
                                     </span>
                                     <h3 className="text-xl font-black text-slate-900">
-                                        Patient Help & Branch Parking Info
+                                        Patient Help & Lab Preparation Info
                                     </h3>
                                     <p className="text-xs text-slate-600 leading-relaxed">
-                                        Have questions about fasting preparation, parking at Shaw Blvd or Greenhills, or
-                                        online appointment scheduling? View our full FAQ directory.
+                                        Have questions about fasting preparation, PhilHealth Konsulta registration, or
+                                        reaching us at 0939-930-6575 / Facebook? View our full FAQ directory.
                                     </p>
                                 </div>
                                 <button
@@ -1867,12 +1984,23 @@ export default function ClientReservationPortal({
                         <div className="space-y-2 pt-2 text-xs">
                             <div className="font-bold text-white text-sm">Contact Us</div>
                             <div className="flex items-center gap-2 text-slate-300">
-                                <Phone className="w-4 h-4 text-teal-400" />
-                                <span>8652-1111 / +1 (800) 555-0199</span>
+                                <Phone className="w-4 h-4 text-teal-400 shrink-0" />
+                                <span>0939-930-6575 / 0956-495-6174</span>
                             </div>
                             <div className="flex items-center gap-2 text-slate-300">
-                                <Mail className="w-4 h-4 text-teal-400" />
-                                <span>inquiry@healthcube.com.ph</span>
+                                <Mail className="w-4 h-4 text-teal-400 shrink-0" />
+                                <span className="break-all">labcurelaboratoryincorporated@gmail.com</span>
+                            </div>
+                            <div className="pt-1">
+                                <a
+                                    href={FACEBOOK_PAGE_URL}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex items-center gap-1.5 text-sky-400 hover:text-sky-300 font-bold"
+                                >
+                                    <span>Facebook: Labcure Lab Calapan OrMin</span>
+                                    <ExternalLink className="w-3.5 h-3.5" />
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -1881,11 +2009,12 @@ export default function ClientReservationPortal({
                         <h4 className="font-bold text-white text-sm">Find Us Here</h4>
                         <div className="flex items-start gap-2 leading-relaxed">
                             <MapPin className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                            <span>241 Shaw Blvd, Mandaluyong, 1552 Metro Manila</span>
+                            <span>
+                                A2RD Commercial Building, Dama de Noche Street, Brgy. Lumangbayan, Calapan City, 5200 Oriental Mindoro
+                            </span>
                         </div>
-                        <div className="flex items-start gap-2 leading-relaxed">
-                            <MapPin className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                            <span>5th Floor, GH Mall, Greenhills Comml Complex, San Juan, 1500 Metro Manila</span>
+                        <div className="text-slate-400 pl-6">
+                            Monday – Saturday: 7:00 AM – 4:00 PM
                         </div>
                     </div>
 
@@ -1985,9 +2114,18 @@ export default function ClientReservationPortal({
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500">
                     <div>
-                        Copyright © 2026 – CarePoint & HealthCube Medical Clinics. All Rights Reserved.
+                        Copyright © 2026 – Labcure Laboratory and Medical Services Inc. (Calapan City, Oriental Mindoro). All Rights Reserved.
                     </div>
                     <div className="flex items-center gap-4">
+                        <a
+                            href={FACEBOOK_PAGE_URL}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="hover:text-slate-300"
+                        >
+                            Facebook
+                        </a>
+                        <span>•</span>
                         <button
                             type="button"
                             onClick={() => onOpenLegalModal('privacy')}
