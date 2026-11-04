@@ -50,20 +50,12 @@ function App() {
         notify('Signed out of portal session. Returned to public Client Website.', 'success');
     };
 
-    const allowedPortals = authSession?.allowedPortals || ['client'];
-    const currentPortalToRender =
-        authSession && allowedPortals.includes(activePortal) ? activePortal : 'client';
+    const currentPortalToRender = authSession?.defaultPortal || 'client';
 
     const sharedPortalProps = {
         authSession,
         activePortal: currentPortalToRender,
-        onSwitchPortal: (target) => {
-            if (authSession && allowedPortals.includes(target)) {
-                setActivePortal(target);
-            } else {
-                setLoginModalOpen(true);
-            }
-        },
+        onSwitchPortal: () => {},
         onLogout: handleLogout,
         notify,
     };
@@ -93,28 +85,11 @@ function App() {
             {/* Active Portal View */}
             <div className="flex-1 flex flex-col">
                 {currentPortalToRender === 'client' && (
-                    <div className="flex-1 flex flex-col lg:flex-row min-h-screen">
-                        {authSession && (
-                            <aside className="w-full lg:w-64 xl:w-72 bg-slate-900 text-slate-200 p-5 flex flex-col justify-between shrink-0 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto border-r border-slate-800">
-                                <div className="space-y-4">
-                                    <div className="pb-4 border-b border-slate-800">
-                                        <CarePointLogo dark size="sm" />
-                                    </div>
-                                    <div className="text-xs text-slate-400 leading-relaxed">
-                                        Viewing the public Client Website while signed in. Use the sidebar below to return to your clinical or administrative workspace.
-                                    </div>
-                                </div>
-                                <PortalSidebarNav {...sharedPortalProps} />
-                            </aside>
-                        )}
-                        <div className="flex-1 min-w-0">
-                            <ClientReservationPortal
-                                {...sharedPortalProps}
-                                onOpenLoginModal={() => setLoginModalOpen(true)}
-                                onOpenLegalModal={(tab) => setLegalModalTab(tab)}
-                            />
-                        </div>
-                    </div>
+                    <ClientReservationPortal
+                        {...sharedPortalProps}
+                        onOpenLoginModal={() => setLoginModalOpen(true)}
+                        onOpenLegalModal={(tab) => setLegalModalTab(tab)}
+                    />
                 )}
                 {currentPortalToRender === 'tv' && <TvQueuePortal {...sharedPortalProps} />}
                 {currentPortalToRender === 'staff' && <StaffReceptionPortal {...sharedPortalProps} />}

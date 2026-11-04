@@ -20,7 +20,7 @@ class RolePermissionService
             'name' => 'Queuing TV Monitor',
             'badge_color' => 'amber',
             'default_portal' => 'tv',
-            'allowed_portals' => ['tv', 'client'],
+            'allowed_portals' => ['tv'],
             'permissions' => [
                 'tv.queue.view',
                 'public.catalog.view',
@@ -30,7 +30,7 @@ class RolePermissionService
             'name' => 'Reception / Clinic Staff',
             'badge_color' => 'cyan',
             'default_portal' => 'staff',
-            'allowed_portals' => ['staff', 'tv', 'client'],
+            'allowed_portals' => ['staff'],
             'permissions' => [
                 'staff.queue.manage',
                 'staff.walkin.generate',
@@ -43,7 +43,7 @@ class RolePermissionService
             'name' => 'Physician / Doctor',
             'badge_color' => 'teal',
             'default_portal' => 'doctor',
-            'allowed_portals' => ['doctor', 'tv', 'client'],
+            'allowed_portals' => ['doctor'],
             'permissions' => [
                 'doctor.patients.view',
                 'doctor.consultation.record',
@@ -55,7 +55,7 @@ class RolePermissionService
             'name' => 'Clinic Administrator',
             'badge_color' => 'blue',
             'default_portal' => 'admin',
-            'allowed_portals' => ['admin', 'staff', 'doctor', 'tv', 'client'],
+            'allowed_portals' => ['admin'],
             'permissions' => [
                 'admin.dashboard.view',
                 'admin.reports.graphs',
@@ -72,7 +72,7 @@ class RolePermissionService
             'name' => 'Super Administrator',
             'badge_color' => 'emerald',
             'default_portal' => 'super_admin',
-            'allowed_portals' => ['super_admin', 'admin', 'staff', 'doctor', 'tv', 'client'],
+            'allowed_portals' => ['super_admin'],
             'permissions' => [
                 '* (Unrestricted Root Access)',
                 'super_admin.health.telemetry',
