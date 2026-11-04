@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Department;
+use App\Models\Doctor;
 use App\Models\SystemLog;
 use App\Models\User;
 use App\Services\ClinicCacheService;
@@ -99,27 +101,136 @@ class AuthController extends Controller
     }
 
     /**
-     * Update a user's assigned role & status (Super Admin / Admin RBAC Manager).
+     * Create a new portal user account (Doctor, Staff/Reception, TV Display, Admin, or Super Admin).
+     * If role is 'doctor', also creates/links a Doctor clinic profile automatically.
+     */
+    public function createAccount(Request $request): JsonResponse
+    {
+        $callerRole = strtolower((string) $request->header('X-Active-Role', 'admin'));
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'email' => ['required', 'email', 'max:150', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:4', 'max:100'],
+            'role' => ['required', 'in:doctor,staff,tv_display,admin,super_admin,patient'],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'department_id' => ['nullable', 'exists:departments,id'],
+            'specialty' => ['nullable', 'string', 'max:120'],
+            'license_number' => ['nullable', 'string', 'max:50'],
+            'room_number' => ['nullable', 'string', 'max:50'],
+            'consultation_fee' => ['nullable', 'numeric', 'min:0'],
+        ]);
+
+        // Only a Super Admin can create another Super Admin account
+        if ($validated['role'] === 'super_admin' && $callerRole !== 'super_admin') {
+            return response()->json([
+                'message' => 'Only a Super Administrator can create another Super Admin account.',
+            ], 403);
+        }
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => $validated['role'],
+            'phone' => $validated['phone'] ?? null,
+            'status' => 'active',
+        ]);
+
+        $doctorProfile = null;
+        if ($validated['role'] === 'doctor') {
+            $deptId = !empty($validated['department_id'])
+                ? (int) $validated['department_id']
+                : (Department::first()?->id ?? 1);
+            $license = !empty($validated['license_number'])
+                ? $validated['license_number']
+                : 'PRC-' . now()->format('Y') . '-' . rand(10000, 99999);
+
+            $doctorProfile = Doctor::updateOrCreate(
+                ['email' => $user->email],
+                [
+                    'user_id' => $user->id,
+                    'department_id' => $deptId,
+                    'name' => $user->name,
+                    'specialty' => $validated['specialty'] ?: 'General & Internal Medicine Specialist',
+                    'license_number' => $license,
+                    'room_number' => $validated['room_number'] ?: 'ROOM 1',
+                    'phone' => $user->phone,
+                    'consultation_fee' => $validated['consultation_fee'] ?? 650.00,
+                    'availability_status' => 'active',
+                    'shift_start' => '08:00 AM',
+                    'shift_end' => '05:00 PM',
+                    'slot_duration_minutes' => 30,
+                    'working_days' => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                    'max_daily_patients' => 25,
+                ]
+            );
+        }
+
+        SystemLog::create([
+            'level' => 'INFO',
+            'category' => 'audit',
+            'message' => "Account Manager created new [" . strtoupper($user->role) . "] account: {$user->name} ({$user->email})",
+            'endpoint' => $request->path(),
+            'method' => 'POST',
+            'ip_address' => $request->ip(),
+        ]);
+
+        ClinicCacheService::bumpVersion();
+
+        return response()->json([
+            'message' => "Created " . strtoupper($user->role) . " account for {$user->name} ({$user->email})!",
+            'user' => $user,
+            'doctor' => $doctorProfile,
+        ], 201);
+    }
+
+    /**
+     * Update a user's assigned role, status, or password (Super Admin / Admin Account Manager).
      */
     public function updateUserRole(Request $request, int $userId): JsonResponse
     {
+        $callerRole = strtolower((string) $request->header('X-Active-Role', 'admin'));
         $user = User::findOrFail($userId);
 
+        if ($user->role === 'super_admin' && $callerRole !== 'super_admin') {
+            return response()->json([
+                'message' => 'Only a Super Administrator can modify a Super Admin account.',
+            ], 403);
+        }
+
         $validated = $request->validate([
-            'role' => ['required', 'in:patient,tv_display,staff,doctor,admin,super_admin'],
+            'role' => ['nullable', 'in:patient,tv_display,staff,doctor,admin,super_admin'],
             'status' => ['nullable', 'in:active,suspended'],
+            'password' => ['nullable', 'string', 'min:4', 'max:100'],
+            'name' => ['nullable', 'string', 'max:120'],
+            'phone' => ['nullable', 'string', 'max:30'],
         ]);
 
+        if (($validated['role'] ?? null) === 'super_admin' && $callerRole !== 'super_admin') {
+            return response()->json([
+                'message' => 'Only a Super Administrator can grant the Super Admin role.',
+            ], 403);
+        }
+
         $oldRole = $user->role;
-        $user->update([
-            'role' => $validated['role'],
+        $updates = [
+            'role' => $validated['role'] ?? $user->role,
             'status' => $validated['status'] ?? $user->status,
-        ]);
+            'name' => $validated['name'] ?? $user->name,
+            'phone' => array_key_exists('phone', $validated) ? $validated['phone'] : $user->phone,
+        ];
+
+        if (!empty($validated['password'])) {
+            $updates['password'] = Hash::make($validated['password']);
+        }
+
+        $user->update($updates);
 
         SystemLog::create([
             'level' => 'WARNING',
             'category' => 'audit',
-            'message' => "RBAC Role Changed: {$user->name} ({$user->email}) updated from [{$oldRole}] to [{$user->role}] (Status: {$user->status})",
+            'message' => "Account Updated: {$user->name} ({$user->email}) role=[{$oldRole} -> {$user->role}] status=[{$user->status}]",
             'endpoint' => $request->path(),
             'method' => 'PUT',
             'ip_address' => $request->ip(),
@@ -128,8 +239,40 @@ class AuthController extends Controller
         ClinicCacheService::bumpVersion();
 
         return response()->json([
-            'message' => "Updated {$user->name}'s role to " . strtoupper($user->role) . " ({$user->status}).",
+            'message' => "Updated {$user->name}'s account (" . strtoupper($user->role) . " • {$user->status}).",
             'user' => $user,
+        ]);
+    }
+
+    /**
+     * Soft-delete a user account from Account Manager.
+     */
+    public function deleteAccount(Request $request, int $userId): JsonResponse
+    {
+        $user = User::findOrFail($userId);
+        if ($user->role === 'super_admin') {
+            return response()->json([
+                'message' => 'Cannot archive the Super Administrator account.',
+            ], 422);
+        }
+
+        $name = $user->name;
+        $email = $user->email;
+        $user->delete();
+
+        SystemLog::create([
+            'level' => 'WARNING',
+            'category' => 'audit',
+            'message' => "Account Manager archived user account: {$name} ({$email})",
+            'endpoint' => $request->path(),
+            'method' => 'DELETE',
+            'ip_address' => $request->ip(),
+        ]);
+
+        ClinicCacheService::bumpVersion();
+
+        return response()->json([
+            'message' => "Account '{$name}' ({$email}) archived and moved to Super Admin Recovery Vault.",
         ]);
     }
 }

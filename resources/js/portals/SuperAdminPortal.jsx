@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import CarePointLogo from '../components/CarePointLogo';
 import PortalSidebarNav from '../components/PortalSidebarNav';
 import WebsiteCmsEditor from '../components/WebsiteCmsEditor';
+import AccountManagerPanel from '../components/AccountManagerPanel';
+import AdminPortal from './AdminPortal';
 import { DashboardPortalSkeleton } from '../components/SkeletonLoaders';
 import { cachedFetchJson, getRbacHeaders, invalidateClientCache } from '../utils/apiCache';
 import { broadcastWebsiteSettings } from '../utils/websiteConfig';
@@ -14,6 +16,8 @@ import {
     RotateCcw,
     RefreshCw,
     Globe,
+    Users,
+    LayoutDashboard,
 } from 'lucide-react';
 
 export default function SuperAdminPortal({
@@ -287,6 +291,36 @@ export default function SuperAdminPortal({
                             <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black">
                                 {softDeleted.total_trashed ?? 0}
                             </span>
+                        </button>
+
+                        <div className="pt-2 px-2 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                            Admin & Clinic Management
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('admin_ops')}
+                            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeTab === 'admin_ops'
+                                    ? 'bg-emerald-600 text-white shadow-sm'
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
+                        >
+                            <LayoutDashboard className="w-4 h-4 text-teal-400 shrink-0" />
+                            <span>Admin Queue & Analytics</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('accounts')}
+                            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeTab === 'accounts'
+                                    ? 'bg-emerald-600 text-white shadow-sm'
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
+                        >
+                            <Users className="w-4 h-4 text-cyan-400 shrink-0" />
+                            <span>Account Manager (Doctors & Staff)</span>
                         </button>
 
                         <button
@@ -859,7 +893,32 @@ export default function SuperAdminPortal({
                         </div>
                     )}
 
-                    {/* TAB 4: WEBSITE & CLINIC BRANDING CMS */}
+                    {/* TAB 4: ADMIN QUEUE, KPIS, ANALYTICS & DOCTOR MANAGEMENT */}
+                    {activeTab === 'admin_ops' && (
+                        <AdminPortal
+                            embedded
+                            authSession={authSession}
+                            activePortal={activePortal}
+                            onSwitchPortal={onSwitchPortal}
+                            onLogout={onLogout}
+                            notify={notify}
+                        />
+                    )}
+
+                    {/* TAB 5: ACCOUNT MANAGER (CREATE & MANAGE DOCTORS & STAFF ACCOUNTS) */}
+                    {activeTab === 'accounts' && (
+                        <AccountManagerPanel
+                            dark
+                            isSuperAdmin
+                            users={data?.active_users || []}
+                            departments={data?.departments || []}
+                            doctors={data?.doctors || []}
+                            notify={notify}
+                            onRefresh={() => fetchSuperAdmin(logLevel, true)}
+                        />
+                    )}
+
+                    {/* TAB 6: WEBSITE & CLINIC BRANDING CMS */}
                     {activeTab === 'cms' && (
                         <WebsiteCmsEditor
                             dark

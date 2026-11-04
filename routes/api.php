@@ -41,7 +41,9 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::post('/admin/doctors', [AdminPortalController::class, 'storeDoctor']);
         Route::delete('/admin/doctors/{doctorId}', [AdminPortalController::class, 'deleteDoctor']);
         Route::put('/admin/settings', [AdminPortalController::class, 'updateSettings']);
+        Route::post('/admin/users', [AuthController::class, 'createAccount']);
         Route::put('/admin/users/{userId}/role', [AuthController::class, 'updateUserRole']);
+        Route::delete('/admin/users/{userId}', [AuthController::class, 'deleteAccount']);
     });
 
     // 5. Super Admin Observatory (RBAC Protected: super_admin ONLY)
@@ -49,6 +51,7 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::get('/super-admin/dashboard', [SuperAdminPortalController::class, 'dashboard']);
         Route::post('/super-admin/restore', [SuperAdminPortalController::class, 'restoreRecord']);
         Route::delete('/super-admin/force-delete', [SuperAdminPortalController::class, 'forceDeleteRecord']);
+        Route::post('/super-admin/users', [AuthController::class, 'createAccount']);
         Route::delete('/super-admin/users/{userId}', [SuperAdminPortalController::class, 'softDeleteUser']);
         Route::put('/super-admin/users/{userId}/role', [AuthController::class, 'updateUserRole']);
         Route::post('/super-admin/logs/{logId}/resolve', [SuperAdminPortalController::class, 'resolveLog']);

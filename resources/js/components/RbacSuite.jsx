@@ -63,7 +63,7 @@ export const PORTAL_ROLE_DEFINITIONS = {
         email: 'superadmin@carepoint.clinic',
         accountName: 'chief.architect (Super Admin)',
         defaultPortal: 'super_admin',
-        allowedPortals: ['super_admin'],
+        allowedPortals: ['super_admin', 'admin'],
         icon: ShieldAlert,
         description: 'System health telemetry, Load Balancer/CDN/Rate-Limiter status, crash logs, and soft-deleted data recovery vault.',
     },

@@ -143,6 +143,7 @@ class AdminPortalController extends Controller
                 'appointments' => $filtered,
                 'doctors' => $doctors,
                 'departments' => $departments,
+                'users' => \App\Models\User::orderBy('id')->get(),
                 'reports' => [
                     'bookings_by_department' => $bookingsByDepartment,
                     'daily_trends' => $dailyTrends,

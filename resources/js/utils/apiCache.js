@@ -1,6 +1,6 @@
 // High-Speed Stale-While-Revalidate (SWR) Client Cache + RBAC Session Manager
 const memoryCache = new Map();
-const CACHE_PREFIX = 'carepoint_swr_v3:';
+const CACHE_PREFIX = 'carepoint_swr_v5:';
 const AUTH_SESSION_KEY = 'carepoint_auth_session_v1';
 
 export function getAuthSession() {

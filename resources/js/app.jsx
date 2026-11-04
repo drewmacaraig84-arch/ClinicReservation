@@ -50,12 +50,26 @@ function App() {
         notify('Signed out of portal session. Returned to public Client Website.', 'success');
     };
 
-    const currentPortalToRender = authSession?.defaultPortal || 'client';
+    const allowedPortals =
+        authSession?.role === 'super_admin'
+            ? ['super_admin', 'admin']
+            : authSession?.defaultPortal
+              ? [authSession.defaultPortal]
+              : ['client'];
+
+    const currentPortalToRender =
+        authSession && allowedPortals.includes(activePortal)
+            ? activePortal
+            : authSession?.defaultPortal || 'client';
 
     const sharedPortalProps = {
         authSession,
         activePortal: currentPortalToRender,
-        onSwitchPortal: () => {},
+        onSwitchPortal: (target) => {
+            if (authSession && allowedPortals.includes(target)) {
+                setActivePortal(target);
+            }
+        },
         onLogout: handleLogout,
         notify,
     };

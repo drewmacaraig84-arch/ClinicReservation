@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CarePointLogo from '../components/CarePointLogo';
 import PortalSidebarNav from '../components/PortalSidebarNav';
 import WebsiteCmsEditor from '../components/WebsiteCmsEditor';
+import AccountManagerPanel from '../components/AccountManagerPanel';
 import { DashboardPortalSkeleton } from '../components/SkeletonLoaders';
 import { cachedFetchJson, invalidateClientCache } from '../utils/apiCache';
 import { broadcastWebsiteSettings } from '../utils/websiteConfig';
@@ -14,6 +15,7 @@ import {
     FileSpreadsheet,
     Bell,
     User,
+    Users,
     Trash2,
     Search,
     Download,
@@ -26,6 +28,7 @@ export default function AdminPortal({
     activePortal,
     onSwitchPortal,
     onLogout,
+    embedded = false,
 }) {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -222,8 +225,9 @@ export default function AdminPortal({
     const doctors = data?.doctors || [];
 
     return (
-        <div className="min-h-screen w-full flex flex-col lg:flex-row bg-slate-100">
+        <div className={embedded ? 'w-full flex flex-col bg-slate-100 text-slate-900 rounded-2xl overflow-hidden border border-slate-700' : 'min-h-screen w-full flex flex-col lg:flex-row bg-slate-100'}>
             {/* Full-Height Left Dark Navy Sidebar */}
+            {!embedded && (
             <aside className="w-full lg:w-72 xl:w-80 bg-slate-900 text-slate-200 p-5 flex flex-col justify-between shrink-0 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto border-r border-slate-800">
                 <div className="space-y-5">
                     <div className="pb-4 border-b border-slate-800">
@@ -244,18 +248,7 @@ export default function AdminPortal({
                             }`}
                         >
                             <LayoutDashboard className="w-4 h-4 shrink-0" />
-                            <span>Dashboard</span>
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={() => setActiveSection('overview')}
-                            className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800 transition cursor-pointer"
-                        >
-                            <span className="flex items-center gap-3">
-                                <SlidersHorizontal className="w-4 h-4 text-teal-400 shrink-0" />
-                                <span>Queue Control</span>
-                            </span>
+                            <span>Dashboard & Queue</span>
                         </button>
 
                         <button
@@ -282,6 +275,19 @@ export default function AdminPortal({
                         >
                             <Calendar className="w-4 h-4 text-cyan-400 shrink-0" />
                             <span>Doctor Schedules</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setActiveSection('accounts')}
+                            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeSection === 'accounts'
+                                    ? 'bg-teal-600 text-white shadow-sm'
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
+                        >
+                            <Users className="w-4 h-4 text-sky-400 shrink-0" />
+                            <span>Account Manager (Doctors & Staff)</span>
                         </button>
 
                         <button
@@ -321,14 +327,50 @@ export default function AdminPortal({
                     onLogout={onLogout}
                 />
             </aside>
+            )}
 
             {/* Main Admin Content Area */}
             <main className="flex-1 min-w-0 flex flex-col">
                     {/* Top Header Bar: Admin Dashboard - Overview | Admin User */}
-                    <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-                        <h1 className="text-lg font-extrabold text-slate-900">
-                            Admin Dashboard - {activeSection === 'overview' ? 'Overview & Queue' : activeSection === 'analytics' ? 'Graph Reports & Analytics' : activeSection === 'doctors' ? 'Doctor Management' : 'Clinic Settings'}
-                        </h1>
+                    <header className="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
+                            <h1 className="text-lg font-extrabold text-slate-900">
+                                Admin Dashboard —{' '}
+                                {activeSection === 'overview'
+                                    ? 'Overview & Queue'
+                                    : activeSection === 'analytics'
+                                      ? 'Graph Reports & Analytics'
+                                      : activeSection === 'doctors'
+                                        ? 'Doctor Management'
+                                        : activeSection === 'accounts'
+                                          ? 'Account Manager (Doctors & Staff)'
+                                          : 'Website & Clinic CMS'}
+                            </h1>
+                            {embedded && (
+                                <div className="flex flex-wrap gap-1.5">
+                                    {[
+                                        { id: 'overview', label: 'Queue & KPIs' },
+                                        { id: 'analytics', label: 'Analytics & Graphs' },
+                                        { id: 'doctors', label: 'Doctor Schedules' },
+                                        { id: 'accounts', label: 'Account Manager' },
+                                        { id: 'settings', label: 'Website CMS' },
+                                    ].map((t) => (
+                                        <button
+                                            key={t.id}
+                                            type="button"
+                                            onClick={() => setActiveSection(t.id)}
+                                            className={`px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
+                                                activeSection === t.id
+                                                    ? 'bg-teal-700 text-white'
+                                                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                                            }`}
+                                        >
+                                            {t.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
 
                         <div className="flex items-center gap-3">
                             <button
@@ -340,7 +382,7 @@ export default function AdminPortal({
                             </button>
                             <div className="flex items-center gap-2 text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-full">
                                 <User className="w-4 h-4 text-slate-600" />
-                                <span>Admin User</span>
+                                <span>{authSession?.user?.name || 'Admin User'}</span>
                             </div>
                             <Bell className="w-4 h-4 text-slate-500" />
                         </div>
@@ -798,6 +840,18 @@ export default function AdminPortal({
                                     </form>
                                 </div>
                             </div>
+                        )}
+
+                        {/* ACCOUNT MANAGER (DOCTORS & STAFF) SECTION */}
+                        {activeSection === 'accounts' && (
+                            <AccountManagerPanel
+                                users={data?.users || []}
+                                departments={data?.departments || []}
+                                doctors={data?.doctors || []}
+                                isSuperAdmin={authSession?.role === 'super_admin'}
+                                notify={notify}
+                                onRefresh={() => fetchAdminDashboard(statusFilter, search, true)}
+                            />
                         )}
 
                         {/* WEBSITE & CLINIC CMS SECTION */}

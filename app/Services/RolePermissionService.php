@@ -72,7 +72,7 @@ class RolePermissionService
             'name' => 'Super Administrator',
             'badge_color' => 'emerald',
             'default_portal' => 'super_admin',
-            'allowed_portals' => ['super_admin'],
+            'allowed_portals' => ['super_admin', 'admin'],
             'permissions' => [
                 '* (Unrestricted Root Access)',
                 'super_admin.health.telemetry',
