@@ -337,33 +337,35 @@ export default function DoctorPortal({
 
             {/* Main Full-Width Content Area */}
             <main className="flex-1 min-w-0 p-6 lg:p-8 xl:p-10 space-y-6">
-                {/* Top Doctor Header & KPI Cards */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
-                        <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Assigned Today</div>
-                        <div className="text-3xl sm:text-4xl font-black text-slate-900 mt-1.5">
-                            {data?.stats?.total_patients_today ?? 0}
+                {/* Top Doctor Header & KPI Cards — Only displayed on main Patients & Queue Dashboard */}
+                {activeTab === 'patients' && (
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+                        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
+                            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Assigned Today</div>
+                            <div className="text-3xl sm:text-4xl font-black text-slate-900 mt-1.5">
+                                {data?.stats?.total_patients_today ?? 0}
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
+                            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Waiting for Me</div>
+                            <div className="text-3xl sm:text-4xl font-black text-teal-700 mt-1.5">
+                                {data?.stats?.waiting_for_me ?? 0}
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
+                            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">In Consultation</div>
+                            <div className="text-3xl sm:text-4xl font-black text-blue-600 mt-1.5">
+                                {data?.stats?.currently_serving ?? 0}
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
+                            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Completed Today</div>
+                            <div className="text-3xl sm:text-4xl font-black text-emerald-600 mt-1.5">
+                                {data?.stats?.completed_today ?? 0}
+                            </div>
                         </div>
                     </div>
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
-                        <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Waiting for Me</div>
-                        <div className="text-3xl sm:text-4xl font-black text-teal-700 mt-1.5">
-                            {data?.stats?.waiting_for_me ?? 0}
-                        </div>
-                    </div>
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
-                        <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">In Consultation</div>
-                        <div className="text-3xl sm:text-4xl font-black text-blue-600 mt-1.5">
-                            {data?.stats?.currently_serving ?? 0}
-                        </div>
-                    </div>
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
-                        <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Completed Today</div>
-                        <div className="text-3xl sm:text-4xl font-black text-emerald-600 mt-1.5">
-                            {data?.stats?.completed_today ?? 0}
-                        </div>
-                    </div>
-                </div>
+                )}
 
                     {/* TAB 1: MY PATIENTS & CLINICAL CONSULTATION */}
                     {activeTab === 'patients' && (

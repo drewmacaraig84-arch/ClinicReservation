@@ -373,13 +373,15 @@ export default function AdminPortal({
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <button
-                                type="button"
-                                onClick={() => setActiveSection(activeSection === 'analytics' ? 'overview' : 'analytics')}
-                                className="px-3 py-1.5 rounded-lg bg-teal-50 text-teal-800 border border-teal-200 text-xs font-bold hover:bg-teal-100 transition cursor-pointer"
-                            >
-                                {activeSection === 'analytics' ? '← Back to Queue Table' : '📊 View Full Graph Reports'}
-                            </button>
+                            {(activeSection === 'overview' || activeSection === 'analytics') && (
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveSection(activeSection === 'analytics' ? 'overview' : 'analytics')}
+                                    className="px-3 py-1.5 rounded-lg bg-teal-50 text-teal-800 border border-teal-200 text-xs font-bold hover:bg-teal-100 transition cursor-pointer"
+                                >
+                                    {activeSection === 'analytics' ? '← Back to Queue Table' : '📊 View Full Graph Reports'}
+                                </button>
+                            )}
                             <div className="flex items-center gap-2 text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-full">
                                 <User className="w-4 h-4 text-slate-600" />
                                 <span>{authSession?.user?.name || 'Admin User'}</span>
@@ -389,138 +391,142 @@ export default function AdminPortal({
                     </header>
 
                     <div className="p-6 space-y-6 flex-1">
-                        {/* 4 Top KPI Cards matching Mockup Bottom-Left (142, 18, 94, 22 mins) */}
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div className="bg-white rounded-xl p-4 border border-slate-200/90 shadow-2xs">
-                                <div className="text-xs font-semibold text-slate-600">Total Bookings today</div>
-                                <div className="text-3xl font-black text-slate-900 mt-1">
-                                    {kpis.total_bookings_today ?? 142}
-                                </div>
-                                <div className="text-[11px] text-emerald-600 font-semibold mt-1">
-                                    Includes {kpis.live_db_bookings_today ?? 0} active live records
-                                </div>
-                            </div>
-
-                            <div className="bg-white rounded-xl p-4 border border-slate-200/90 shadow-2xs">
-                                <div className="text-xs font-semibold text-slate-600">Currently Waiting</div>
-                                <div className="text-3xl font-black text-slate-900 mt-1">
-                                    {kpis.currently_waiting ?? 18}
-                                </div>
-                                <div className="text-[11px] text-teal-700 font-semibold mt-1">
-                                    Real-time active queue
-                                </div>
-                            </div>
-
-                            <div className="bg-white rounded-xl p-4 border border-slate-200/90 shadow-2xs">
-                                <div className="text-xs font-semibold text-slate-600">Served Today</div>
-                                <div className="text-3xl font-black text-slate-900 mt-1">
-                                    {kpis.served_today ?? 94}
-                                </div>
-                                <div className="text-[11px] text-blue-600 font-semibold mt-1">
-                                    96.4% completion rate
-                                </div>
-                            </div>
-
-                            <div className="bg-white rounded-xl p-4 border border-slate-200/90 shadow-2xs">
-                                <div className="text-xs font-semibold text-slate-600">Avg. Waiting Time</div>
-                                <div className="text-3xl font-black text-slate-900 mt-1">
-                                    {kpis.avg_waiting_time ?? 22} mins
-                                </div>
-                                <div className="text-[11px] text-slate-500 font-semibold mt-1">
-                                    Target SLA: &lt; 25 mins
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Interactive Visual Graph Reports Strip (Always accessible in Overview & Expanded in Analytics) */}
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                            {/* 7-Day Reservation Trend Bar Chart */}
-                            <div className="lg:col-span-7 bg-white rounded-xl border border-slate-200 p-5 shadow-2xs">
-                                <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-                                    <div>
-                                        <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                                            <TrendingUp className="w-4 h-4 text-teal-600" />
-                                            <span>7-Day Reservation & Queue Volume Graph</span>
-                                        </h3>
-                                        <p className="text-[11px] text-slate-500">
-                                            Daily comparison of Online Bookings vs Walk-In Queue Tickets
-                                        </p>
+                        {/* 4 Top KPI Cards & Graphs — Only displayed on Dashboard (Overview & Analytics) */}
+                        {(activeSection === 'overview' || activeSection === 'analytics') && (
+                            <>
+                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div className="bg-white rounded-xl p-4 border border-slate-200/90 shadow-2xs">
+                                        <div className="text-xs font-semibold text-slate-600">Total Bookings today</div>
+                                        <div className="text-3xl font-black text-slate-900 mt-1">
+                                            {kpis.total_bookings_today ?? 142}
+                                        </div>
+                                        <div className="text-[11px] text-emerald-600 font-semibold mt-1">
+                                            Includes {kpis.live_db_bookings_today ?? 0} active live records
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-3 text-[11px] font-bold">
-                                        <span className="inline-flex items-center gap-1 text-teal-700">
-                                            <span className="w-2.5 h-2.5 rounded-xs bg-teal-600" /> Online
-                                        </span>
-                                        <span className="inline-flex items-center gap-1 text-cyan-600">
-                                            <span className="w-2.5 h-2.5 rounded-xs bg-cyan-400" /> Walk-In
-                                        </span>
+
+                                    <div className="bg-white rounded-xl p-4 border border-slate-200/90 shadow-2xs">
+                                        <div className="text-xs font-semibold text-slate-600">Currently Waiting</div>
+                                        <div className="text-3xl font-black text-slate-900 mt-1">
+                                            {kpis.currently_waiting ?? 18}
+                                        </div>
+                                        <div className="text-[11px] text-teal-700 font-semibold mt-1">
+                                            Real-time active queue
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white rounded-xl p-4 border border-slate-200/90 shadow-2xs">
+                                        <div className="text-xs font-semibold text-slate-600">Served Today</div>
+                                        <div className="text-3xl font-black text-slate-900 mt-1">
+                                            {kpis.served_today ?? 94}
+                                        </div>
+                                        <div className="text-[11px] text-blue-600 font-semibold mt-1">
+                                            96.4% completion rate
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white rounded-xl p-4 border border-slate-200/90 shadow-2xs">
+                                        <div className="text-xs font-semibold text-slate-600">Avg. Waiting Time</div>
+                                        <div className="text-3xl font-black text-slate-900 mt-1">
+                                            {kpis.avg_waiting_time ?? 22} mins
+                                        </div>
+                                        <div className="text-[11px] text-slate-500 font-semibold mt-1">
+                                            Target SLA: &lt; 25 mins
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-7 gap-2 items-end h-40 pt-4 px-2 border-b border-slate-200">
-                                    {(reports.daily_trends || []).map((day) => {
-                                        const total = day.online + day.walk_in;
-                                        const onlineH = Math.min(100, Math.round((day.online / 160) * 100));
-                                        const walkInH = Math.min(100, Math.round((day.walk_in / 160) * 100));
-                                        return (
-                                            <div key={day.date} className="flex flex-col items-center gap-1 h-full justify-end group">
-                                                <div className="text-[10px] font-bold text-slate-600">{total}</div>
-                                                <div className="w-full max-w-[34px] flex flex-col justify-end rounded-t overflow-hidden bg-slate-100 h-28">
-                                                    <div
-                                                        style={{ height: `${walkInH}%` }}
-                                                        className="bg-cyan-400 transition-all"
-                                                        title={`Walk-In: ${day.walk_in}`}
-                                                    />
-                                                    <div
-                                                        style={{ height: `${onlineH}%` }}
-                                                        className="bg-teal-600 transition-all"
-                                                        title={`Online: ${day.online}`}
-                                                    />
-                                                </div>
-                                                <div className="text-[10px] font-bold text-slate-500 pt-1">
-                                                    {day.short_label}
-                                                </div>
+                                {/* Interactive Visual Graph Reports Strip */}
+                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                                    {/* 7-Day Reservation Trend Bar Chart */}
+                                    <div className="lg:col-span-7 bg-white rounded-xl border border-slate-200 p-5 shadow-2xs">
+                                        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                                            <div>
+                                                <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                                                    <TrendingUp className="w-4 h-4 text-teal-600" />
+                                                    <span>7-Day Reservation & Queue Volume Graph</span>
+                                                </h3>
+                                                <p className="text-[11px] text-slate-500">
+                                                    Daily comparison of Online Bookings vs Walk-In Queue Tickets
+                                                </p>
                                             </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-
-                            {/* Department Distribution Graph */}
-                            <div className="lg:col-span-5 bg-white rounded-xl border border-slate-200 p-5 shadow-2xs">
-                                <div className="mb-3">
-                                    <h3 className="text-sm font-extrabold text-slate-900">
-                                        Reservations by Department
-                                    </h3>
-                                    <p className="text-[11px] text-slate-500">
-                                        Live distribution across clinic specialties
-                                    </p>
-                                </div>
-
-                                <div className="space-y-3">
-                                    {(reports.bookings_by_department || []).slice(0, 5).map((dept) => {
-                                        const pct = Math.min(100, Math.max(15, dept.total * 22));
-                                        return (
-                                            <div key={dept.id} className="space-y-1">
-                                                <div className="flex justify-between text-xs">
-                                                    <span className="font-bold text-slate-800">
-                                                        [{dept.code}] {dept.name}
-                                                    </span>
-                                                    <span className="font-bold text-teal-700">
-                                                        {dept.total} bookings ({dept.waiting} waiting)
-                                                    </span>
-                                                </div>
-                                                <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                                                    <div
-                                                        style={{ width: `${pct}%` }}
-                                                        className="h-full bg-gradient-to-r from-teal-600 to-emerald-500 rounded-full"
-                                                    />
-                                                </div>
+                                            <div className="flex items-center gap-3 text-[11px] font-bold">
+                                                <span className="inline-flex items-center gap-1 text-teal-700">
+                                                    <span className="w-2.5 h-2.5 rounded-xs bg-teal-600" /> Online
+                                                </span>
+                                                <span className="inline-flex items-center gap-1 text-cyan-600">
+                                                    <span className="w-2.5 h-2.5 rounded-xs bg-cyan-400" /> Walk-In
+                                                </span>
                                             </div>
-                                        );
-                                    })}
+                                        </div>
+
+                                        <div className="grid grid-cols-7 gap-2 items-end h-40 pt-4 px-2 border-b border-slate-200">
+                                            {(reports.daily_trends || []).map((day) => {
+                                                const total = day.online + day.walk_in;
+                                                const onlineH = Math.min(100, Math.round((day.online / 160) * 100));
+                                                const walkInH = Math.min(100, Math.round((day.walk_in / 160) * 100));
+                                                return (
+                                                    <div key={day.date} className="flex flex-col items-center gap-1 h-full justify-end group">
+                                                        <div className="text-[10px] font-bold text-slate-600">{total}</div>
+                                                        <div className="w-full max-w-[34px] flex flex-col justify-end rounded-t overflow-hidden bg-slate-100 h-28">
+                                                            <div
+                                                                style={{ height: `${walkInH}%` }}
+                                                                className="bg-cyan-400 transition-all"
+                                                                title={`Walk-In: ${day.walk_in}`}
+                                                            />
+                                                            <div
+                                                                style={{ height: `${onlineH}%` }}
+                                                                className="bg-teal-600 transition-all"
+                                                                title={`Online: ${day.online}`}
+                                                            />
+                                                        </div>
+                                                        <div className="text-[10px] font-bold text-slate-500 pt-1">
+                                                            {day.short_label}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* Department Distribution Graph */}
+                                    <div className="lg:col-span-5 bg-white rounded-xl border border-slate-200 p-5 shadow-2xs">
+                                        <div className="mb-3">
+                                            <h3 className="text-sm font-extrabold text-slate-900">
+                                                Reservations by Department
+                                            </h3>
+                                            <p className="text-[11px] text-slate-500">
+                                                Live distribution across clinic specialties
+                                            </p>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            {(reports.bookings_by_department || []).slice(0, 5).map((dept) => {
+                                                const pct = Math.min(100, Math.max(15, dept.total * 22));
+                                                return (
+                                                    <div key={dept.id} className="space-y-1">
+                                                        <div className="flex justify-between text-xs">
+                                                            <span className="font-bold text-slate-800">
+                                                                [{dept.code}] {dept.name}
+                                                            </span>
+                                                            <span className="font-bold text-teal-700">
+                                                                {dept.total} bookings ({dept.waiting} waiting)
+                                                            </span>
+                                                        </div>
+                                                        <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                                                            <div
+                                                                style={{ width: `${pct}%` }}
+                                                                className="h-full bg-gradient-to-r from-teal-600 to-emerald-500 rounded-full"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
+                            </>
+                        )}
 
                         {/* OVERVIEW SECTION: Queue Management Table + Live Doctor Availability (Matches Mockup Bottom-Left) */}
                         {activeSection === 'overview' && (

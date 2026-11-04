@@ -358,68 +358,70 @@ export default function SuperAdminPortal({
 
             {/* Main Observatory Workspace */}
             <main className="flex-1 min-w-0 p-6 lg:p-8 xl:p-10 space-y-6">
-                    {/* Top Telemetry Strip */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
-                        <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
-                            <div className="text-[11px] font-bold text-slate-400 uppercase">MySQL Latency</div>
-                            <div className="text-2xl font-black text-emerald-400 mt-1">
-                                {health.database?.latency_ms ?? 0.8} ms
+                    {/* Top Telemetry Strip — Only displayed on System Health & Cluster Dashboard */}
+                    {activeTab === 'health' && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
+                            <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
+                                <div className="text-[11px] font-bold text-slate-400 uppercase">MySQL Latency</div>
+                                <div className="text-2xl font-black text-emerald-400 mt-1">
+                                    {health.database?.latency_ms ?? 0.8} ms
+                                </div>
+                                <div className="text-[10px] text-slate-500 mt-0.5 truncate" title={health.database?.database_name}>
+                                    DB: {health.database?.database_name}
+                                </div>
                             </div>
-                            <div className="text-[10px] text-slate-500 mt-0.5 truncate" title={health.database?.database_name}>
-                                DB: {health.database?.database_name}
-                            </div>
-                        </div>
 
-                        <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
-                            <div className="text-[11px] font-bold text-slate-400 uppercase">Memory Footprint</div>
-                            <div className="text-2xl font-black text-cyan-400 mt-1">
-                                {health.resources?.memory_usage_mb ?? 24} MB
+                            <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
+                                <div className="text-[11px] font-bold text-slate-400 uppercase">Memory Footprint</div>
+                                <div className="text-2xl font-black text-cyan-400 mt-1">
+                                    {health.resources?.memory_usage_mb ?? 24} MB
+                                </div>
+                                <div className="text-[10px] text-slate-500 mt-0.5">
+                                    Peak: {health.resources?.memory_peak_mb ?? 28} MB
+                                </div>
                             </div>
-                            <div className="text-[10px] text-slate-500 mt-0.5">
-                                Peak: {health.resources?.memory_peak_mb ?? 28} MB
-                            </div>
-                        </div>
 
-                        <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
-                            <div className="text-[11px] font-bold text-slate-400 uppercase">Disk Available</div>
-                            <div className="text-2xl font-black text-white mt-1">
-                                {health.resources?.disk_free_gb ?? 120} GB
+                            <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
+                                <div className="text-[11px] font-bold text-slate-400 uppercase">Disk Available</div>
+                                <div className="text-2xl font-black text-white mt-1">
+                                    {health.resources?.disk_free_gb ?? 120} GB
+                                </div>
+                                <div className="text-[10px] text-slate-500 mt-0.5">
+                                    {health.resources?.disk_used_percent ?? 35}% utilized
+                                </div>
                             </div>
-                            <div className="text-[10px] text-slate-500 mt-0.5">
-                                {health.resources?.disk_used_percent ?? 35}% utilized
-                            </div>
-                        </div>
 
-                        <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
-                            <div className="text-[11px] font-bold text-slate-400 uppercase">Crash Exceptions</div>
-                            <div className="text-2xl font-black text-red-400 mt-1">
-                                {logCounts.crashes ?? 0}
+                            <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
+                                <div className="text-[11px] font-bold text-slate-400 uppercase">Crash Exceptions</div>
+                                <div className="text-2xl font-black text-red-400 mt-1">
+                                    {logCounts.crashes ?? 0}
+                                </div>
+                                <div className="text-[10px] text-slate-500 mt-0.5">
+                                    {logCounts.unresolved_crashes ?? 0} unresolved
+                                </div>
                             </div>
-                            <div className="text-[10px] text-slate-500 mt-0.5">
-                                {logCounts.unresolved_crashes ?? 0} unresolved
-                            </div>
-                        </div>
 
-                        <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
-                            <div className="text-[11px] font-bold text-slate-400 uppercase">WAF & Rate Blocks</div>
-                            <div className="text-2xl font-black text-amber-400 mt-1">
-                                {(logCounts.security_events ?? 0) + (logCounts.rate_limit_blocks ?? 0)}
+                            <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
+                                <div className="text-[11px] font-bold text-slate-400 uppercase">WAF & Rate Blocks</div>
+                                <div className="text-2xl font-black text-amber-400 mt-1">
+                                    {(logCounts.security_events ?? 0) + (logCounts.rate_limit_blocks ?? 0)}
+                                </div>
+                                <div className="text-[10px] text-slate-500 mt-0.5">
+                                    Attacks neutralized
+                                </div>
                             </div>
-                            <div className="text-[10px] text-slate-500 mt-0.5">
-                                Attacks neutralized
-                            </div>
-                        </div>
 
-                        <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
-                            <div className="text-[11px] font-bold text-slate-400 uppercase">Soft-Deleted Vault</div>
-                            <div className="text-2xl font-black text-purple-400 mt-1">
-                                {softDeleted.total_trashed ?? 0}
-                            </div>
-                            <div className="text-[10px] text-slate-500 mt-0.5">
-                                Recoverable records
+                            <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
+                                <div className="text-[11px] font-bold text-slate-400 uppercase">Soft-Deleted Vault</div>
+                                <div className="text-2xl font-black text-purple-400 mt-1">
+                                    {softDeleted.total_trashed ?? 0}
+                                </div>
+                                <div className="text-[10px] text-slate-500 mt-0.5">
+                                    Recoverable records
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* TAB 1: SYSTEM HEALTH, LOAD BALANCER, CDN, RATE LIMITER & WAF */}
                     {activeTab === 'health' && (
