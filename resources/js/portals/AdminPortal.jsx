@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import CarePointLogo from '../components/CarePointLogo';
 import PortalSidebarNav from '../components/PortalSidebarNav';
+import WebsiteCmsEditor from '../components/WebsiteCmsEditor';
 import { DashboardPortalSkeleton } from '../components/SkeletonLoaders';
 import { cachedFetchJson, invalidateClientCache } from '../utils/apiCache';
+import { broadcastWebsiteSettings } from '../utils/websiteConfig';
 import {
     LayoutDashboard,
     SlidersHorizontal,
@@ -292,7 +294,7 @@ export default function AdminPortal({
                             }`}
                         >
                             <Settings className="w-4 h-4 text-amber-400 shrink-0" />
-                            <span>Clinic Settings</span>
+                            <span>Website & Clinic CMS</span>
                         </button>
 
                         <button
@@ -798,27 +800,16 @@ export default function AdminPortal({
                             </div>
                         )}
 
-                        {/* SETTINGS SECTION */}
+                        {/* WEBSITE & CLINIC CMS SECTION */}
                         {activeSection === 'settings' && (
-                            <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 w-full space-y-4">
-                                <h3 className="text-lg font-extrabold text-slate-900">
-                                    TV Queue Display Ticker Announcement
-                                </h3>
-                                <form onSubmit={handleSaveSettings} className="space-y-4">
-                                    <textarea
-                                        rows={4}
-                                        value={tickerNews}
-                                        onChange={(e) => setTickerNews(e.target.value)}
-                                        className="w-full rounded-xl border border-slate-300 p-4 text-sm focus:border-teal-600 focus:outline-none"
-                                    />
-                                    <button
-                                        type="submit"
-                                        className="px-6 py-3 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-bold cursor-pointer"
-                                    >
-                                        Update Live TV Ticker
-                                    </button>
-                                </form>
-                            </div>
+                            <WebsiteCmsEditor
+                                initialSettings={data?.settings}
+                                notify={notify}
+                                onSaved={(updated) => {
+                                    broadcastWebsiteSettings(updated);
+                                    fetchAdminDashboard(statusFilter, search, true);
+                                }}
+                            />
                         )}
                     </div>
                 </main>

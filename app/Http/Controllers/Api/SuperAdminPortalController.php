@@ -168,6 +168,7 @@ class SuperAdminPortalController extends Controller
                 'departments' => $trashedDepartments,
             ],
             'active_users' => User::orderBy('id')->get(),
+            'settings' => \App\Models\ClinicSetting::pluck('value', 'key'),
         ]);
     }
 

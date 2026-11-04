@@ -53,5 +53,6 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::put('/super-admin/users/{userId}/role', [AuthController::class, 'updateUserRole']);
         Route::post('/super-admin/logs/{logId}/resolve', [SuperAdminPortalController::class, 'resolveLog']);
         Route::post('/super-admin/simulate', [SuperAdminPortalController::class, 'simulateDiagnostic']);
+        Route::put('/super-admin/settings', [AdminPortalController::class, 'updateSettings']);
     });
 });

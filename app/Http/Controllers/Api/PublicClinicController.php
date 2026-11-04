@@ -59,9 +59,10 @@ class PublicClinicController extends Controller
             $settings = ClinicSetting::pluck('value', 'key');
 
             return [
-                'clinic_name' => $settings['clinic_name'] ?? 'CarePoint Clinic',
+                'clinic_name' => $settings['clinic_name'] ?? 'Labcure Laboratory & Medical Services Inc.',
                 'ticker_news' => $settings['ticker_news'] ?? 'Flu vaccines are now available. Inquiry at the reception desk. • Online appointments enjoy priority lane check-in at Desk 1.',
-                'emergency_hotline' => $settings['emergency_hotline'] ?? '+1 (800) 555-CARE',
+                'emergency_hotline' => $settings['contact_phone'] ?? '0939-930-6575 / 0956-495-6174',
+                'settings' => $settings,
                 'today_date' => now()->toDateString(),
                 'departments' => $departments,
                 'doctors' => $doctors,

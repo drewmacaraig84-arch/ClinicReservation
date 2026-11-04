@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CarePointLogo from '../components/CarePointLogo';
 import { ClientWebsiteSkeleton } from '../components/SkeletonLoaders';
 import { cachedFetchJson, invalidateClientCache } from '../utils/apiCache';
+import { useWebsiteConfig } from '../utils/websiteConfig';
 import {
     Stethoscope,
     CheckCircle2,
@@ -274,6 +275,14 @@ export default function LabcureReservationPortal({
     const [openDropdown, setOpenDropdown] = useState(null);
     const [openFaqIndex, setOpenFaqIndex] = useState(0);
 
+    const cms = useWebsiteConfig(catalog?.settings);
+    const FACEBOOK_PAGE_URL = cms.facebook_url;
+    const SERVICES_DROPDOWN = cms.servicesList;
+    const CHECKUPS_DROPDOWN = cms.checkupsList;
+    const HMO_PARTNERS_LIST = cms.hmosList;
+    const DISCOUNT_CARDS_LIST = cms.discountsList;
+    const FAQS = cms.faqsList;
+
     const [activePage, setActivePage] = useState(() => resolvePageFromLocation());
     const [highlightedItem, setHighlightedItem] = useState(() => {
         if (typeof window === 'undefined') return '';
@@ -532,18 +541,18 @@ export default function LabcureReservationPortal({
                 <div className="max-w-[1480px] mx-auto px-4 sm:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-4 sm:gap-5 flex-wrap">
                         <a
-                            href="mailto:labcurelaboratoryincorporated@gmail.com"
+                            href={`mailto:${cms.contact_email}`}
                             className="inline-flex items-center gap-1.5 hover:text-cyan-200 transition font-medium"
                         >
                             <Mail className="w-3.5 h-3.5" />
-                            <span>labcurelaboratoryincorporated@gmail.com</span>
+                            <span>{cms.contact_email}</span>
                         </a>
                         <a
-                            href="tel:09399306575"
+                            href={`tel:${(cms.contact_phone || '').replace(/[^0-9+]/g, '')}`}
                             className="inline-flex items-center gap-1.5 hover:text-cyan-200 transition font-semibold"
                         >
                             <Phone className="w-3.5 h-3.5" />
-                            <span>0939-930-6575 / 0956-495-6174</span>
+                            <span>{cms.contact_phone}</span>
                         </a>
                         <a
                             href={FACEBOOK_PAGE_URL}
@@ -552,7 +561,7 @@ export default function LabcureReservationPortal({
                             className="inline-flex items-center gap-1.5 text-sky-200 hover:text-white transition font-semibold"
                         >
                             <ExternalLink className="w-3.5 h-3.5" />
-                            <span>FB: Labcure Lab Calapan OrMin</span>
+                            <span>FB: {cms.brand_short_name}</span>
                         </a>
                     </div>
 
@@ -600,10 +609,10 @@ export default function LabcureReservationPortal({
                         <span className="hidden sm:inline-block h-6 w-px bg-slate-200" />
                         <div className="hidden sm:block leading-tight">
                             <div className="text-xs font-black tracking-tight text-[#13467b]">
-                                Calapan City, OrMin
+                                {cms.header_location}
                             </div>
                             <div className="text-[10px] font-bold uppercase tracking-widest text-teal-700">
-                                PhilHealth Konsulta Accredited
+                                {cms.header_accreditation}
                             </div>
                         </div>
                     </div>
@@ -1400,16 +1409,13 @@ export default function LabcureReservationPortal({
                         <div className="bg-gradient-to-r from-slate-900 via-[#13467b] to-teal-900 rounded-2xl p-8 sm:p-10 text-white flex flex-wrap items-center justify-between gap-8">
                             <div className="space-y-4 max-w-2xl">
                                 <span className="text-xs font-extrabold uppercase tracking-widest text-teal-300">
-                                    ABOUT LABCURE LABORATORY & MEDICAL SERVICES INC.
+                                    ABOUT {cms.clinic_name}
                                 </span>
                                 <h1 className="text-2xl sm:text-4xl font-black tracking-tight">
-                                    Trusted Clinical Laboratory & Multispecialty Care in Calapan City
+                                    {cms.about_title}
                                 </h1>
                                 <p className="text-xs sm:text-base text-slate-200 leading-relaxed">
-                                    Located at A2RD Commercial Building, Dama de Noche Street, Brgy. Lumangbayan, Calapan City,
-                                    Oriental Mindoro, <strong>Labcure Laboratory and Medical Services Inc.</strong> provides
-                                    accurate outpatient diagnostic testing, PhilHealth Konsulta primary care, and specialist
-                                    medical consultations for individuals, families, and partner institutions.
+                                    {cms.about_story}
                                 </p>
                                 <div className="pt-2 flex flex-wrap gap-3">
                                     <a
@@ -1418,7 +1424,7 @@ export default function LabcureReservationPortal({
                                         rel="noreferrer"
                                         className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-[#13467b] font-extrabold text-xs sm:text-sm shadow-md hover:bg-blue-50 transition"
                                     >
-                                        <span>Visit Official Facebook Page (@LabcureLab)</span>
+                                        <span>Visit Official Facebook Page</span>
                                         <ExternalLink className="w-4 h-4" />
                                     </a>
                                     <button
@@ -1432,8 +1438,8 @@ export default function LabcureReservationPortal({
                             </div>
                             <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-white p-2 shadow-2xl shrink-0 mx-auto">
                                 <img
-                                    src="/labcure-logo.jpg"
-                                    alt="Labcure Laboratory Inc. & Medical Services"
+                                    src={cms.logo_url || '/labcure-logo.jpg'}
+                                    alt={cms.clinic_name}
                                     className="w-full h-full object-cover rounded-full"
                                 />
                             </div>
@@ -1446,8 +1452,7 @@ export default function LabcureReservationPortal({
                                 </div>
                                 <h3 className="text-lg font-black text-slate-900">Our Mission</h3>
                                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                                    To deliver accessible, accurate, and compassionate diagnostic laboratory and primary care
-                                    services to the people of Calapan City and Oriental Mindoro.
+                                    {cms.about_mission}
                                 </p>
                             </div>
 
@@ -1457,8 +1462,7 @@ export default function LabcureReservationPortal({
                                 </div>
                                 <h3 className="text-lg font-black text-slate-900">Our Vision</h3>
                                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                                    To be Oriental Mindoro’s premier outpatient diagnostic laboratory and multispecialty
-                                    medical clinic known for clinical integrity, fast turnaround times, and patient-centered care.
+                                    {cms.about_vision}
                                 </p>
                             </div>
 
@@ -1468,8 +1472,7 @@ export default function LabcureReservationPortal({
                                 </div>
                                 <h3 className="text-lg font-black text-slate-900">PhilHealth Konsulta & DOH Standards</h3>
                                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                                    Accredited under PhilHealth Konsulta / YAKAP and compliant with Department of Health (DOH)
-                                    clinical laboratory standards and RA 10173 Data Privacy safeguards.
+                                    {cms.about_standards}
                                 </p>
                             </div>
                         </div>
@@ -1477,28 +1480,27 @@ export default function LabcureReservationPortal({
                         <div className="bg-slate-900 text-white rounded-2xl p-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                             <div className="space-y-3">
                                 <span className="text-xs font-bold uppercase tracking-widest text-teal-400">
-                                    OUR CALAPAN CITY FACILITY
+                                    OUR CLINIC FACILITY
                                 </span>
-                                <h2 className="text-2xl font-black">Visit Labcure Laboratory Inc.</h2>
+                                <h2 className="text-2xl font-black">Visit {cms.clinic_name}</h2>
                                 <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                                    Conveniently located in Barangay Lumangbayan, Calapan City, featuring automated blood
-                                    chemistry and hematology analyzers, digital imaging, ECG, and specialist consultation rooms.
+                                    {cms.about_story}
                                 </p>
                             </div>
                             <div className="space-y-4 text-xs sm:text-sm">
                                 <div className="p-4 rounded-xl bg-slate-800/90 border border-slate-700 space-y-1">
                                     <div className="font-extrabold text-teal-300">Main Clinic & Diagnostic Laboratory</div>
                                     <div className="text-slate-200">
-                                        A2RD Commercial Building, Dama de Noche Street, Brgy. Lumangbayan, Calapan City, 5200 Oriental Mindoro
+                                        {cms.contact_address}
                                     </div>
                                     <div className="text-slate-400 text-xs">
-                                        Open Monday – Saturday • Starting at 7:00 AM
+                                        {cms.operating_hours}
                                     </div>
                                 </div>
                                 <div className="p-4 rounded-xl bg-slate-800/90 border border-slate-700 space-y-1">
                                     <div className="font-extrabold text-teal-300">Direct Contact & Facebook Page</div>
                                     <div className="text-slate-200">
-                                        Mobile: 0939-930-6575 / 0956-495-6174 • Email: labcurelaboratoryincorporated@gmail.com
+                                        Mobile: {cms.contact_phone} • Email: {cms.contact_email}
                                     </div>
                                     <div>
                                         <a
@@ -1507,7 +1509,7 @@ export default function LabcureReservationPortal({
                                             rel="noreferrer"
                                             className="text-sky-300 hover:underline text-xs font-bold inline-flex items-center gap-1"
                                         >
-                                            <span>https://www.facebook.com/LabcureLab</span>
+                                            <span>{FACEBOOK_PAGE_URL}</span>
                                             <ExternalLink className="w-3 h-3" />
                                         </a>
                                     </div>
@@ -1709,15 +1711,13 @@ export default function LabcureReservationPortal({
                         <div className="max-w-[1480px] mx-auto px-4 sm:px-8 py-14 lg:py-20 relative z-10 text-center max-w-3xl space-y-5">
                             <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold uppercase tracking-wider text-teal-200 border border-white/20">
                                 <Sparkles className="w-3.5 h-3.5" />
-                                Labcure Laboratory & Medical Services Inc. • Calapan City, Oriental Mindoro
+                                {cms.hero_badge}
                             </span>
                             <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
-                                Your Health & Diagnostic Needs, All in One Place
+                                {cms.hero_title}
                             </h1>
                             <p className="text-sm sm:text-base text-slate-200 leading-relaxed">
-                                Trusted outpatient clinical laboratory, digital X-ray, ultrasound, 12-lead ECG, PhilHealth
-                                Konsulta primary care, and specialist consultations at Dama de Noche St., Brgy. Lumangbayan,
-                                Calapan City.
+                                {cms.hero_subtitle}
                             </p>
                             <div className="pt-2 flex flex-wrap items-center justify-center gap-3.5">
                                 <button
@@ -1910,11 +1910,10 @@ export default function LabcureReservationPortal({
                                         ABOUT US
                                     </span>
                                     <h3 className="text-xl font-black text-slate-900">
-                                        Labcure Lab Calapan OrMin
+                                        {cms.clinic_name}
                                     </h3>
-                                    <p className="text-xs text-slate-600 leading-relaxed">
-                                        Discover our mission, vision, PhilHealth Konsulta accreditation, and our facility at
-                                        A2RD Commercial Building, Dama de Noche St., Brgy. Lumangbayan, Calapan City.
+                                    <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+                                        {cms.about_story}
                                     </p>
                                 </div>
                                 <button
@@ -1985,11 +1984,11 @@ export default function LabcureReservationPortal({
                             <div className="font-bold text-white text-sm">Contact Us</div>
                             <div className="flex items-center gap-2 text-slate-300">
                                 <Phone className="w-4 h-4 text-teal-400 shrink-0" />
-                                <span>0939-930-6575 / 0956-495-6174</span>
+                                <span>{cms.contact_phone}</span>
                             </div>
                             <div className="flex items-center gap-2 text-slate-300">
                                 <Mail className="w-4 h-4 text-teal-400 shrink-0" />
-                                <span className="break-all">labcurelaboratoryincorporated@gmail.com</span>
+                                <span className="break-all">{cms.contact_email}</span>
                             </div>
                             <div className="pt-1">
                                 <a
@@ -1998,7 +1997,7 @@ export default function LabcureReservationPortal({
                                     rel="noreferrer"
                                     className="inline-flex items-center gap-1.5 text-sky-400 hover:text-sky-300 font-bold"
                                 >
-                                    <span>Facebook: Labcure Lab Calapan OrMin</span>
+                                    <span>Facebook: {cms.clinic_name}</span>
                                     <ExternalLink className="w-3.5 h-3.5" />
                                 </a>
                             </div>
@@ -2010,11 +2009,11 @@ export default function LabcureReservationPortal({
                         <div className="flex items-start gap-2 leading-relaxed">
                             <MapPin className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                             <span>
-                                A2RD Commercial Building, Dama de Noche Street, Brgy. Lumangbayan, Calapan City, 5200 Oriental Mindoro
+                                {cms.contact_address}
                             </span>
                         </div>
                         <div className="text-slate-400 pl-6">
-                            Monday – Saturday: 7:00 AM – 4:00 PM
+                            {cms.operating_hours}
                         </div>
                     </div>
 
@@ -2114,7 +2113,7 @@ export default function LabcureReservationPortal({
 
                 <div className="max-w-[1480px] mx-auto px-4 sm:px-8 pt-6 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500">
                     <div>
-                        Copyright © 2026 – Labcure Laboratory and Medical Services Inc. (Calapan City, Oriental Mindoro). All Rights Reserved.
+                        Copyright © 2026 – {cms.clinic_name}. All Rights Reserved.
                     </div>
                     <div className="flex items-center gap-4">
                         <a

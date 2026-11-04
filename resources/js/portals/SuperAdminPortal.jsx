@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import CarePointLogo from '../components/CarePointLogo';
 import PortalSidebarNav from '../components/PortalSidebarNav';
+import WebsiteCmsEditor from '../components/WebsiteCmsEditor';
 import { DashboardPortalSkeleton } from '../components/SkeletonLoaders';
 import { cachedFetchJson, getRbacHeaders, invalidateClientCache } from '../utils/apiCache';
+import { broadcastWebsiteSettings } from '../utils/websiteConfig';
 import {
     ShieldAlert,
     Activity,
@@ -11,6 +13,7 @@ import {
     Trash2,
     RotateCcw,
     RefreshCw,
+    Globe,
 } from 'lucide-react';
 
 export default function SuperAdminPortal({
@@ -284,6 +287,19 @@ export default function SuperAdminPortal({
                             <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black">
                                 {softDeleted.total_trashed ?? 0}
                             </span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('cms')}
+                            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeTab === 'cms'
+                                    ? 'bg-emerald-600 text-white shadow-sm'
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
+                        >
+                            <Globe className="w-4 h-4 text-sky-400 shrink-0" />
+                            <span>Website & Clinic CMS</span>
                         </button>
 
                         <button
@@ -841,6 +857,19 @@ export default function SuperAdminPortal({
                                 </div>
                             )}
                         </div>
+                    )}
+
+                    {/* TAB 4: WEBSITE & CLINIC BRANDING CMS */}
+                    {activeTab === 'cms' && (
+                        <WebsiteCmsEditor
+                            dark
+                            initialSettings={data?.settings}
+                            notify={notify}
+                            onSaved={(updated) => {
+                                broadcastWebsiteSettings(updated);
+                                fetchSuperAdmin(logLevel, true);
+                            }}
+                        />
                     )}
                 </main>
             </div>

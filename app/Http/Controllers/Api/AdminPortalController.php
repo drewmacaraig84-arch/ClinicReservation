@@ -331,25 +331,67 @@ class AdminPortalController extends Controller
     }
 
     /**
-     * Update Clinic Settings (e.g., TV Display Ticker News).
+     * Update Clinic & Website CMS Settings (Logo, Brand Name, Services, Check-Ups, About Us, Contact Info, TV Ticker).
      */
     public function updateSettings(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'ticker_news' => ['required', 'string', 'max:500'],
-            'clinic_name' => ['nullable', 'string', 'max:120'],
-        ]);
+        $allowedKeys = [
+            'clinic_name',
+            'brand_short_name',
+            'brand_subtitle',
+            'logo_url',
+            'header_location',
+            'header_accreditation',
+            'contact_phone',
+            'contact_email',
+            'contact_address',
+            'operating_hours',
+            'facebook_url',
+            'ticker_news',
+            'hero_badge',
+            'hero_title',
+            'hero_subtitle',
+            'about_title',
+            'about_story',
+            'about_mission',
+            'about_vision',
+            'about_standards',
+            'services_json',
+            'checkups_json',
+            'hmo_json',
+            'discounts_json',
+            'faqs_json',
+        ];
+
+        $rules = [];
+        foreach ($allowedKeys as $key) {
+            $rules[$key] = ['nullable', 'string', 'max:64000'];
+        }
+
+        $validated = $request->validate($rules);
 
         foreach ($validated as $key => $value) {
             if ($value !== null) {
-                ClinicSetting::updateOrCreate(['key' => $key], ['value' => $value, 'group' => 'display']);
+                ClinicSetting::updateOrCreate(
+                    ['key' => $key],
+                    ['value' => $value, 'group' => 'cms']
+                );
             }
         }
+
+        SystemLog::create([
+            'level' => 'INFO',
+            'category' => 'audit',
+            'message' => 'Website CMS & Clinic Branding settings updated.',
+            'endpoint' => $request->path(),
+            'method' => 'PUT',
+            'ip_address' => $request->ip(),
+        ]);
 
         ClinicCacheService::bumpVersion();
 
         return response()->json([
-            'message' => 'Clinic display settings updated!',
+            'message' => 'Website content & clinic branding saved! Changes are now live on the website.',
             'settings' => ClinicSetting::pluck('value', 'key'),
         ]);
     }
