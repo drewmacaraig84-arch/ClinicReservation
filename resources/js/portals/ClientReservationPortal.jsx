@@ -48,7 +48,6 @@ const CHECKUPS_DROPDOWN = [
 const PATIENT_RESOURCES_DROPDOWN = [
     { name: 'HMO Partners', target: 'hmo' },
     { name: 'Discount Cards', target: 'hmo' },
-    { name: 'Live Queue Tracker', target: 'booking' },
 ];
 
 const ABOUT_DROPDOWN = [
