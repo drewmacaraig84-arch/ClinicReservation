@@ -48,19 +48,23 @@ export function getRbacHeaders(extraHeaders = {}) {
     return headers;
 }
 
-export function getCachedData(url) {
+function getScopedCacheKey(url) {
     const session = getAuthSession();
     const userScope = session?.user?.id ? `u${session.user.id}:` : '';
-    const roleScopedUrl = `${getActiveRole()}:${userScope}${url}`;
-    if (memoryCache.has(roleScopedUrl)) {
-        return memoryCache.get(roleScopedUrl).data;
+    return `${getActiveRole()}:${userScope}${url}`;
+}
+
+export function getCachedData(url) {
+    const key = getScopedCacheKey(url);
+    if (memoryCache.has(key)) {
+        return memoryCache.get(key).data;
     }
     try {
-        const raw = sessionStorage.getItem(CACHE_PREFIX + roleScopedUrl);
+        const raw = sessionStorage.getItem(CACHE_PREFIX + key);
         if (raw) {
             const parsed = JSON.parse(raw);
             if (parsed && parsed.data) {
-                memoryCache.set(roleScopedUrl, parsed);
+                memoryCache.set(key, parsed);
                 return parsed.data;
             }
         }
@@ -71,13 +75,11 @@ export function getCachedData(url) {
 }
 
 export function setCachedData(url, data) {
-    const session = getAuthSession();
-    const userScope = session?.user?.id ? `u${session.user.id}:` : '';
-    const roleScopedUrl = `${getActiveRole()}:${userScope}${url}`;
+    const key = getScopedCacheKey(url);
     const entry = { data, timestamp: Date.now() };
-    memoryCache.set(roleScopedUrl, entry);
+    memoryCache.set(key, entry);
     try {
-        sessionStorage.setItem(CACHE_PREFIX + roleScopedUrl, JSON.stringify(entry));
+        sessionStorage.setItem(CACHE_PREFIX + key, JSON.stringify(entry));
     } catch (e) {
         // Ignore storage errors
     }

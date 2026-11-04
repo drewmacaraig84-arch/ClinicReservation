@@ -49,17 +49,21 @@ function App() {
         notify('Signed out of portal session. Returned to public Client Website.', 'success');
     };
 
-    const allowedPortals =
-        authSession?.role === 'super_admin'
-            ? ['super_admin', 'admin', 'client']
-            : authSession?.defaultPortal
-              ? [authSession.defaultPortal, 'client']
-              : ['client'];
+    let allowedPortals = ['client'];
+    if (authSession?.role === 'super_admin') {
+        allowedPortals = ['super_admin', 'admin', 'client'];
+    } else if (authSession?.defaultPortal) {
+        allowedPortals = [authSession.defaultPortal, 'client'];
+    }
 
-    const currentPortalToRender =
-        authSession && allowedPortals.includes(activePortal)
-            ? activePortal
-            : authSession?.defaultPortal || 'client';
+    let currentPortalToRender = 'client';
+    if (authSession) {
+        if (allowedPortals.includes(activePortal)) {
+            currentPortalToRender = activePortal;
+        } else {
+            currentPortalToRender = authSession.defaultPortal || 'client';
+        }
+    }
 
     const sharedPortalProps = {
         authSession,
