@@ -94,9 +94,11 @@ export function invalidateClientCache() {
  * Fetches JSON with instant cache hydration (Stale-While-Revalidate) and RBAC role header.
  */
 export async function cachedFetchJson(url, onData, forceNetwork = false) {
+    let servedFromCache = false;
     if (!forceNetwork) {
         const cached = getCachedData(url);
         if (cached) {
+            servedFromCache = true;
             onData(cached, true);
         }
     }
@@ -108,6 +110,8 @@ export async function cachedFetchJson(url, onData, forceNetwork = false) {
     if (res.ok) {
         setCachedData(url, freshData);
         onData(freshData, false);
+    } else if (!servedFromCache) {
+        throw new Error(freshData?.message || `HTTP ${res.status}`);
     }
     return { ok: res.ok, status: res.status, data: freshData };
 }

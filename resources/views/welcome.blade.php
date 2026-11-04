@@ -14,15 +14,16 @@
             $manifest = (!file_exists($hotPath) && file_exists($manifestPath))
                 ? json_decode(file_get_contents($manifestPath), true)
                 : null;
+            $buildVer = ($manifest && file_exists($manifestPath)) ? @filemtime($manifestPath) : 1;
         @endphp
         @if ($manifest && isset($manifest['resources/js/app.jsx']))
             @if (isset($manifest['resources/css/app.css']['file']))
-                <link rel="stylesheet" href="/build/{{ $manifest['resources/css/app.css']['file'] }}" />
+                <link rel="stylesheet" href="/build/{{ $manifest['resources/css/app.css']['file'] }}?v={{ $buildVer }}" />
             @endif
             @foreach ($manifest['resources/js/app.jsx']['css'] ?? [] as $cssFile)
-                <link rel="stylesheet" href="/build/{{ $cssFile }}" />
+                <link rel="stylesheet" href="/build/{{ $cssFile }}?v={{ $buildVer }}" />
             @endforeach
-            <script type="module" src="/build/{{ $manifest['resources/js/app.jsx']['file'] }}"></script>
+            <script type="module" src="/build/{{ $manifest['resources/js/app.jsx']['file'] }}?v={{ $buildVer }}"></script>
         @else
             @viteReactRefresh
             @vite(['resources/css/app.css', 'resources/js/app.jsx'])
