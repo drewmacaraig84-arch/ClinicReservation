@@ -77,43 +77,41 @@ export function ClientWebsiteSkeleton() {
 }
 
 export function DashboardPortalSkeleton({ dark = false }) {
-    const bgOuter = dark ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200';
+    const bgOuter = dark ? 'bg-slate-950' : 'bg-slate-100';
     const bgCard = dark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200';
     const pulse = dark ? 'bg-slate-800 animate-pulse' : 'bg-slate-200 animate-pulse';
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-            <div className={`rounded-2xl shadow-xl border overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[78vh] ${bgOuter}`}>
-                <div className="lg:col-span-3 xl:col-span-2 bg-slate-900 p-5 space-y-5">
-                    <div className="h-8 w-36 bg-slate-800 rounded-lg animate-pulse" />
-                    <div className="space-y-2.5 pt-4">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                            <div key={i} className="h-9 w-full bg-slate-800 rounded-lg animate-pulse" />
-                        ))}
-                    </div>
+        <div className={`min-h-screen w-full flex flex-col lg:flex-row ${bgOuter}`}>
+            <div className="w-full lg:w-72 xl:w-80 bg-slate-900 p-5 space-y-5 shrink-0 border-r border-slate-800">
+                <div className="h-9 w-40 bg-slate-800 rounded-lg animate-pulse" />
+                <div className="space-y-2.5 pt-4">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <div key={i} className="h-10 w-full bg-slate-800 rounded-lg animate-pulse" />
+                    ))}
                 </div>
-                <div className="lg:col-span-9 xl:col-span-10 p-6 space-y-6">
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                        {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className={`rounded-xl p-5 border space-y-3 ${bgCard}`}>
-                                <div className={`h-3 w-24 rounded ${pulse}`} />
-                                <div className={`h-8 w-20 rounded-lg ${pulse}`} />
-                            </div>
+            </div>
+            <div className="flex-1 p-6 lg:p-8 xl:p-10 space-y-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+                    {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className={`rounded-2xl p-5 border space-y-3 ${bgCard}`}>
+                            <div className={`h-3 w-24 rounded ${pulse}`} />
+                            <div className={`h-9 w-20 rounded-lg ${pulse}`} />
+                        </div>
+                    ))}
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div className={`lg:col-span-8 rounded-2xl p-6 border space-y-4 ${bgCard}`}>
+                        <div className={`h-5 w-48 rounded ${pulse}`} />
+                        {[1, 2, 3, 4, 5].map((row) => (
+                            <div key={row} className={`h-12 w-full rounded-lg ${pulse}`} />
                         ))}
                     </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        <div className={`lg:col-span-8 rounded-xl p-6 border space-y-4 ${bgCard}`}>
-                            <div className={`h-5 w-48 rounded ${pulse}`} />
-                            {[1, 2, 3, 4, 5].map((row) => (
-                                <div key={row} className={`h-12 w-full rounded-lg ${pulse}`} />
-                            ))}
-                        </div>
-                        <div className={`lg:col-span-4 rounded-xl p-6 border space-y-4 ${bgCard}`}>
-                            <div className={`h-5 w-36 rounded ${pulse}`} />
-                            {[1, 2, 3, 4].map((item) => (
-                                <div key={item} className={`h-10 w-full rounded-lg ${pulse}`} />
-                            ))}
-                        </div>
+                    <div className={`lg:col-span-4 rounded-2xl p-6 border space-y-4 ${bgCard}`}>
+                        <div className={`h-5 w-36 rounded ${pulse}`} />
+                        {[1, 2, 3, 4].map((item) => (
+                            <div key={item} className={`h-10 w-full rounded-lg ${pulse}`} />
+                        ))}
                     </div>
                 </div>
             </div>

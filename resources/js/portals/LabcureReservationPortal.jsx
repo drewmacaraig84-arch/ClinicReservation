@@ -529,7 +529,7 @@ export default function LabcureReservationPortal({
         <div className="bg-white min-h-screen flex flex-col">
             {/* 1. TOP ROYAL-BLUE UTILITY BAR */}
             <div className="bg-[#13467b] text-white text-xs">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
+                <div className="max-w-[1480px] mx-auto px-4 sm:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-4 sm:gap-5 flex-wrap">
                         <a
                             href="mailto:labcurelaboratoryincorporated@gmail.com"
@@ -591,7 +591,7 @@ export default function LabcureReservationPortal({
                 className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs"
                 onMouseLeave={() => setOpenDropdown(null)}
             >
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+                <div className="max-w-[1480px] mx-auto px-4 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
                     <div
                         onClick={() => navigateToPage('home')}
                         className="flex items-center gap-3 cursor-pointer"
@@ -771,7 +771,7 @@ export default function LabcureReservationPortal({
 
             {activePage === 'schedule' && (
                 <section className="bg-slate-100 py-8 border-b border-slate-200 flex-1">
-                    <div className="max-w-4xl mx-auto px-4 sm:px-6">
+                    <div className="max-w-6xl mx-auto px-4 sm:px-8">
                         {bookedReceipt && (
                             <div className="mb-6 bg-emerald-50 border-2 border-emerald-500 rounded-xl p-5 shadow-sm">
                                 <div className="flex flex-wrap items-start justify-between gap-4">
@@ -1091,7 +1091,7 @@ export default function LabcureReservationPortal({
 
             {activePage === 'services' && (
                 <section className="py-12 bg-slate-50 border-b border-slate-200 flex-1">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10">
+                    <div className="max-w-[1480px] mx-auto px-4 sm:px-8 space-y-10">
                         <div className="bg-gradient-to-r from-[#13467b] to-teal-800 rounded-2xl p-8 text-white flex flex-wrap items-center justify-between gap-6">
                             <div className="max-w-2xl space-y-2">
                                 <span className="text-xs font-extrabold uppercase tracking-widest text-teal-200">
@@ -1207,7 +1207,7 @@ export default function LabcureReservationPortal({
 
             {activePage === 'checkups' && (
                 <section className="py-12 bg-slate-50 border-b border-slate-200 flex-1">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10">
+                    <div className="max-w-[1480px] mx-auto px-4 sm:px-8 space-y-10">
                         <div className="bg-gradient-to-r from-slate-900 via-[#13467b] to-teal-900 rounded-2xl p-8 text-white flex flex-wrap items-center justify-between gap-6">
                             <div className="max-w-2xl space-y-2">
                                 <span className="text-xs font-extrabold uppercase tracking-widest text-teal-200">
@@ -1305,7 +1305,7 @@ export default function LabcureReservationPortal({
 
             {activePage === 'resources' && (
                 <section className="py-12 bg-slate-50 border-b border-slate-200 flex-1">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
+                    <div className="max-w-[1480px] mx-auto px-4 sm:px-8 space-y-12">
                         <div className="bg-gradient-to-r from-[#13467b] to-slate-900 rounded-2xl p-8 text-white flex flex-wrap items-center justify-between gap-6">
                             <div className="max-w-2xl space-y-2">
                                 <span className="text-xs font-extrabold uppercase tracking-widest text-teal-300">
@@ -1396,7 +1396,7 @@ export default function LabcureReservationPortal({
 
             {activePage === 'about' && (
                 <section className="py-12 bg-white border-b border-slate-200 flex-1">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
+                    <div className="max-w-[1480px] mx-auto px-4 sm:px-8 space-y-12">
                         <div className="bg-gradient-to-r from-slate-900 via-[#13467b] to-teal-900 rounded-2xl p-8 sm:p-10 text-white flex flex-wrap items-center justify-between gap-8">
                             <div className="space-y-4 max-w-2xl">
                                 <span className="text-xs font-extrabold uppercase tracking-widest text-teal-300">
@@ -1520,7 +1520,7 @@ export default function LabcureReservationPortal({
 
             {activePage === 'doctors' && (
                 <section className="py-12 bg-slate-50 border-b border-slate-200 flex-1">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-8">
+                    <div className="max-w-[1480px] mx-auto px-4 sm:px-8 space-y-8">
                         <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-2xs space-y-6">
                             <div className="flex flex-wrap items-end justify-between gap-4">
                                 <div>
@@ -1629,7 +1629,7 @@ export default function LabcureReservationPortal({
 
             {activePage === 'faqs' && (
                 <section className="py-12 bg-slate-50 border-b border-slate-200 flex-1">
-                    <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-10">
+                    <div className="max-w-6xl mx-auto px-4 sm:px-8 space-y-10">
                         <div className="text-center space-y-2">
                             <span className="text-xs font-extrabold uppercase tracking-widest text-[#13467b]">
                                 HELP CENTER & PATIENT INQUIRIES
@@ -1706,7 +1706,7 @@ export default function LabcureReservationPortal({
             {activePage === 'home' && (
                 <>
                     <section className="relative bg-gradient-to-r from-slate-900 via-[#13467b] to-teal-900 text-white overflow-hidden">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 lg:py-20 relative z-10 text-center max-w-3xl space-y-5">
+                        <div className="max-w-[1480px] mx-auto px-4 sm:px-8 py-14 lg:py-20 relative z-10 text-center max-w-3xl space-y-5">
                             <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold uppercase tracking-wider text-teal-200 border border-white/20">
                                 <Sparkles className="w-3.5 h-3.5" />
                                 Labcure Laboratory & Medical Services Inc. • Calapan City, Oriental Mindoro
@@ -1748,7 +1748,7 @@ export default function LabcureReservationPortal({
                     </section>
 
                     <section className="py-12 bg-white border-b border-slate-200">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10">
+                        <div className="max-w-[1480px] mx-auto px-4 sm:px-8 space-y-10">
                             <div className="space-y-5">
                                 <div className="flex flex-wrap items-end justify-between gap-4">
                                     <div>
@@ -1844,7 +1844,7 @@ export default function LabcureReservationPortal({
                     </section>
 
                     <section className="py-12 bg-slate-50 border-b border-slate-200">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-6">
+                        <div className="max-w-[1480px] mx-auto px-4 sm:px-8 space-y-6">
                             <div className="flex flex-wrap items-end justify-between gap-4">
                                 <div>
                                     <div className="text-xs font-extrabold uppercase tracking-widest text-teal-700">
@@ -1903,7 +1903,7 @@ export default function LabcureReservationPortal({
                     </section>
 
                     <section className="py-12 bg-white border-b border-slate-200">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="max-w-[1480px] mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
                             <div className="rounded-2xl border border-slate-200 p-6 bg-slate-50 flex flex-col justify-between space-y-4">
                                 <div className="space-y-2">
                                     <span className="text-xs font-extrabold uppercase tracking-widest text-[#13467b]">
@@ -1978,7 +1978,7 @@ export default function LabcureReservationPortal({
             )}
 
             <footer className="bg-[#05070a] text-slate-300 pt-14 pb-10 mt-auto">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 pb-10 border-b border-slate-800">
+                <div className="max-w-[1480px] mx-auto px-4 sm:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 pb-10 border-b border-slate-800">
                     <div className="space-y-4">
                         <CarePointLogo dark size="md" />
                         <div className="space-y-2 pt-2 text-xs">
@@ -2112,7 +2112,7 @@ export default function LabcureReservationPortal({
                     </div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500">
+                <div className="max-w-[1480px] mx-auto px-4 sm:px-8 pt-6 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500">
                     <div>
                         Copyright © 2026 – Labcure Laboratory and Medical Services Inc. (Calapan City, Oriental Mindoro). All Rights Reserved.
                     </div>

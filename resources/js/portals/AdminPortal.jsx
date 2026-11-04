@@ -1,25 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import CarePointLogo from '../components/CarePointLogo';
+import PortalSidebarNav from '../components/PortalSidebarNav';
 import { DashboardPortalSkeleton } from '../components/SkeletonLoaders';
 import { cachedFetchJson, invalidateClientCache } from '../utils/apiCache';
 import {
     LayoutDashboard,
     SlidersHorizontal,
     Calendar,
-    Users,
     Settings,
     BarChart3,
     FileSpreadsheet,
     Bell,
     User,
     Trash2,
-    Plus,
     Search,
     Download,
     TrendingUp,
 } from 'lucide-react';
 
-export default function AdminPortal({ notify, onSwitchPortal }) {
+export default function AdminPortal({
+    notify,
+    authSession,
+    activePortal,
+    onSwitchPortal,
+    onLogout,
+}) {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeSection, setActiveSection] = useState('overview'); // overview, analytics, doctors, settings
@@ -215,99 +220,108 @@ export default function AdminPortal({ notify, onSwitchPortal }) {
     const doctors = data?.doctors || [];
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-            {/* Admin Dashboard Frame matching Mockup Bottom-Left */}
-            <div className="bg-slate-100 rounded-2xl shadow-xl border border-slate-200 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[80vh]">
-                {/* Left Dark Navy Sidebar */}
-                <aside className="lg:col-span-3 xl:col-span-2 bg-slate-900 text-slate-200 p-4 flex flex-col justify-between">
-                    <div className="space-y-6">
-                        <div className="px-2 pt-1 pb-4 border-b border-slate-800">
-                            <CarePointLogo dark size="sm" />
-                        </div>
-
-                        <nav className="space-y-1">
-                            <button
-                                type="button"
-                                onClick={() => setActiveSection('overview')}
-                                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                                    activeSection === 'overview'
-                                        ? 'bg-teal-600 text-white shadow-sm'
-                                        : 'text-slate-300 hover:bg-slate-800'
-                                }`}
-                            >
-                                <LayoutDashboard className="w-4 h-4" />
-                                <span>Dashboard</span>
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => setActiveSection('overview')}
-                                className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800 transition cursor-pointer"
-                            >
-                                <span className="flex items-center gap-3">
-                                    <SlidersHorizontal className="w-4 h-4 text-teal-400" />
-                                    <span>Queue Control</span>
-                                </span>
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => setActiveSection('analytics')}
-                                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                                    activeSection === 'analytics'
-                                        ? 'bg-teal-600 text-white shadow-sm'
-                                        : 'text-slate-300 hover:bg-slate-800'
-                                }`}
-                            >
-                                <BarChart3 className="w-4 h-4 text-emerald-400" />
-                                <span>Analytics & Graphs</span>
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => setActiveSection('doctors')}
-                                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                                    activeSection === 'doctors'
-                                        ? 'bg-teal-600 text-white shadow-sm'
-                                        : 'text-slate-300 hover:bg-slate-800'
-                                }`}
-                            >
-                                <Calendar className="w-4 h-4 text-cyan-400" />
-                                <span>Doctor Schedules</span>
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => setActiveSection('settings')}
-                                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                                    activeSection === 'settings'
-                                        ? 'bg-teal-600 text-white shadow-sm'
-                                        : 'text-slate-300 hover:bg-slate-800'
-                                }`}
-                            >
-                                <Settings className="w-4 h-4 text-amber-400" />
-                                <span>Clinic Settings</span>
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={exportCsvReport}
-                                className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800 transition cursor-pointer"
-                            >
-                                <FileSpreadsheet className="w-4 h-4 text-teal-300" />
-                                <span>Export CSV Report</span>
-                            </button>
-                        </nav>
+        <div className="min-h-screen w-full flex flex-col lg:flex-row bg-slate-100">
+            {/* Full-Height Left Dark Navy Sidebar */}
+            <aside className="w-full lg:w-72 xl:w-80 bg-slate-900 text-slate-200 p-5 flex flex-col justify-between shrink-0 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto border-r border-slate-800">
+                <div className="space-y-5">
+                    <div className="pb-4 border-b border-slate-800">
+                        <CarePointLogo dark size="sm" />
                     </div>
+
+                    <nav className="space-y-1.5">
+                        <div className="px-2 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                            Admin Workspace
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setActiveSection('overview')}
+                            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeSection === 'overview'
+                                    ? 'bg-teal-600 text-white shadow-sm'
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
+                        >
+                            <LayoutDashboard className="w-4 h-4 shrink-0" />
+                            <span>Dashboard</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setActiveSection('overview')}
+                            className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800 transition cursor-pointer"
+                        >
+                            <span className="flex items-center gap-3">
+                                <SlidersHorizontal className="w-4 h-4 text-teal-400 shrink-0" />
+                                <span>Queue Control</span>
+                            </span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setActiveSection('analytics')}
+                            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeSection === 'analytics'
+                                    ? 'bg-teal-600 text-white shadow-sm'
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
+                        >
+                            <BarChart3 className="w-4 h-4 text-emerald-400 shrink-0" />
+                            <span>Analytics & Graphs</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setActiveSection('doctors')}
+                            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeSection === 'doctors'
+                                    ? 'bg-teal-600 text-white shadow-sm'
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
+                        >
+                            <Calendar className="w-4 h-4 text-cyan-400 shrink-0" />
+                            <span>Doctor Schedules</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setActiveSection('settings')}
+                            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeSection === 'settings'
+                                    ? 'bg-teal-600 text-white shadow-sm'
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
+                        >
+                            <Settings className="w-4 h-4 text-amber-400 shrink-0" />
+                            <span>Clinic Settings</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={exportCsvReport}
+                            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800 transition cursor-pointer"
+                        >
+                            <FileSpreadsheet className="w-4 h-4 text-teal-300 shrink-0" />
+                            <span>Export CSV Report</span>
+                        </button>
+                    </nav>
 
                     <div className="bg-slate-800/90 rounded-xl p-3 border border-slate-700 text-[11px] text-slate-400 space-y-1">
                         <div className="font-bold text-white">Soft-Delete Protection</div>
                         <p>Deleted reservations move to the Super Admin Vault for audit & recovery.</p>
                     </div>
-                </aside>
+                </div>
 
-                {/* Main Admin Content Area */}
-                <main className="lg:col-span-9 xl:col-span-10 flex flex-col">
+                {/* Portal Switcher & Sign Out in Left Sidebar */}
+                <PortalSidebarNav
+                    authSession={authSession}
+                    activePortal={activePortal}
+                    onSwitchPortal={onSwitchPortal}
+                    onLogout={onLogout}
+                />
+            </aside>
+
+            {/* Main Admin Content Area */}
+            <main className="flex-1 min-w-0 flex flex-col">
                     {/* Top Header Bar: Admin Dashboard - Overview | Admin User */}
                     <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
                         <h1 className="text-lg font-extrabold text-slate-900">
@@ -786,20 +800,20 @@ export default function AdminPortal({ notify, onSwitchPortal }) {
 
                         {/* SETTINGS SECTION */}
                         {activeSection === 'settings' && (
-                            <div className="bg-white rounded-xl border border-slate-200 p-6 max-w-2xl space-y-4">
-                                <h3 className="text-base font-extrabold text-slate-900">
+                            <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 w-full space-y-4">
+                                <h3 className="text-lg font-extrabold text-slate-900">
                                     TV Queue Display Ticker Announcement
                                 </h3>
                                 <form onSubmit={handleSaveSettings} className="space-y-4">
                                     <textarea
-                                        rows={3}
+                                        rows={4}
                                         value={tickerNews}
                                         onChange={(e) => setTickerNews(e.target.value)}
-                                        className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:border-teal-600 focus:outline-none"
+                                        className="w-full rounded-xl border border-slate-300 p-4 text-sm focus:border-teal-600 focus:outline-none"
                                     />
                                     <button
                                         type="submit"
-                                        className="px-5 py-2.5 rounded-lg bg-teal-700 text-white text-xs font-bold cursor-pointer"
+                                        className="px-6 py-3 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-bold cursor-pointer"
                                     >
                                         Update Live TV Ticker
                                     </button>
@@ -809,7 +823,6 @@ export default function AdminPortal({ notify, onSwitchPortal }) {
                     </div>
                 </main>
             </div>
-        </div>
     );
 }
 

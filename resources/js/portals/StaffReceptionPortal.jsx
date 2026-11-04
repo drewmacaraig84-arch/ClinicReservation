@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import CarePointLogo from '../components/CarePointLogo';
+import PortalSidebarNav from '../components/PortalSidebarNav';
 import { DashboardPortalSkeleton } from '../components/SkeletonLoaders';
 import { cachedFetchJson, invalidateClientCache } from '../utils/apiCache';
 import {
     UserCheck,
     SlidersHorizontal,
-    CalendarPlus,
     HelpCircle,
     Search,
     ChevronRight,
     Stethoscope,
-    PhoneCall,
-    Play,
-    RotateCcw,
-    CheckCircle2,
-    PlusCircle,
 } from 'lucide-react';
 
-export default function StaffReceptionPortal({ notify }) {
+export default function StaffReceptionPortal({
+    notify,
+    authSession,
+    activePortal,
+    onSwitchPortal,
+    onLogout,
+}) {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('checkin'); // checkin, doctors, helpdesk
@@ -133,71 +135,75 @@ export default function StaffReceptionPortal({ notify }) {
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-            {/* Staff / Reception Frame matching Mockup Bottom-Right */}
-            <div className="bg-slate-100 rounded-2xl shadow-xl border border-slate-200 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[78vh]">
-                {/* Left Dark Navy Sidebar: Reception Desk 1 */}
-                <aside className="lg:col-span-3 xl:col-span-2 bg-slate-900 text-slate-200 flex flex-col justify-between p-4">
-                    <div className="space-y-6">
-                        <div className="px-2 pt-2 border-b border-slate-800 pb-4">
-                            <div className="text-lg font-extrabold text-white tracking-tight">
-                                Reception Desk 1
-                            </div>
-                            <div className="text-xs text-teal-400 font-semibold mt-0.5">
-                                Frontline Check-In & Queue
-                            </div>
-                        </div>
-
-                        <nav className="space-y-1.5">
-                            <button
-                                type="button"
-                                onClick={() => setActiveTab('checkin')}
-                                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                                    activeTab === 'checkin'
-                                        ? 'bg-teal-600 text-white shadow-sm'
-                                        : 'text-slate-300 hover:bg-slate-800'
-                                }`}
-                            >
-                                <UserCheck className="w-4 h-4" />
-                                <span>Patient Check-In</span>
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => setActiveTab('checkin')}
-                                className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800 transition cursor-pointer"
-                            >
-                                <SlidersHorizontal className="w-4 h-4 text-teal-400" />
-                                <span>Queue Control</span>
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => setActiveTab('doctors')}
-                                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                                    activeTab === 'doctors'
-                                        ? 'bg-teal-600 text-white shadow-sm'
-                                        : 'text-slate-300 hover:bg-slate-800'
-                                }`}
-                            >
-                                <Stethoscope className="w-4 h-4 text-emerald-400" />
-                                <span>Doctor Availability</span>
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => setActiveTab('helpdesk')}
-                                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                                    activeTab === 'helpdesk'
-                                        ? 'bg-teal-600 text-white shadow-sm'
-                                        : 'text-slate-300 hover:bg-slate-800'
-                                }`}
-                            >
-                                <HelpCircle className="w-4 h-4 text-cyan-400" />
-                                <span>Helpdesk & Triage</span>
-                            </button>
-                        </nav>
+        <div className="min-h-screen w-full flex flex-col lg:flex-row bg-slate-100">
+            {/* Full-Height Left Dark Navy Sidebar: Reception Desk 1 */}
+            <aside className="w-full lg:w-72 xl:w-80 bg-slate-900 text-slate-200 flex flex-col justify-between p-5 shrink-0 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto border-r border-slate-800">
+                <div className="space-y-5">
+                    <div className="pb-4 border-b border-slate-800">
+                        <CarePointLogo dark size="sm" />
                     </div>
+
+                    <div className="border-b border-slate-800 pb-4">
+                        <div className="text-lg font-extrabold text-white tracking-tight">
+                            Reception Desk 1
+                        </div>
+                        <div className="text-xs text-teal-400 font-semibold mt-0.5">
+                            Frontline Check-In & Queue
+                        </div>
+                    </div>
+
+                    <nav className="space-y-1.5">
+                        <div className="px-2 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                            Reception Workspace
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('checkin')}
+                            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeTab === 'checkin'
+                                    ? 'bg-teal-600 text-white shadow-sm'
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
+                        >
+                            <UserCheck className="w-4 h-4 shrink-0" />
+                            <span>Patient Check-In</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('checkin')}
+                            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800 transition cursor-pointer"
+                        >
+                            <SlidersHorizontal className="w-4 h-4 text-teal-400 shrink-0" />
+                            <span>Queue Control</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('doctors')}
+                            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeTab === 'doctors'
+                                    ? 'bg-teal-600 text-white shadow-sm'
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
+                        >
+                            <Stethoscope className="w-4 h-4 text-emerald-400 shrink-0" />
+                            <span>Doctor Availability</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('helpdesk')}
+                            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeTab === 'helpdesk'
+                                    ? 'bg-teal-600 text-white shadow-sm'
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
+                        >
+                            <HelpCircle className="w-4 h-4 text-cyan-400 shrink-0" />
+                            <span>Helpdesk & Triage</span>
+                        </button>
+                    </nav>
 
                     {/* Mini Live Reception Metrics */}
                     <div className="bg-slate-800/90 rounded-xl p-3.5 border border-slate-700/80 space-y-2 text-xs">
@@ -214,10 +220,19 @@ export default function StaffReceptionPortal({ notify }) {
                             <span className="font-bold text-teal-300">{data?.stats?.available_doctors_count ?? 0}</span>
                         </div>
                     </div>
-                </aside>
+                </div>
 
-                {/* Main Reception Workspace */}
-                <main className="lg:col-span-9 xl:col-span-10 p-6 grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+                {/* Portal Switcher & Sign Out in Left Sidebar */}
+                <PortalSidebarNav
+                    authSession={authSession}
+                    activePortal={activePortal}
+                    onSwitchPortal={onSwitchPortal}
+                    onLogout={onLogout}
+                />
+            </aside>
+
+            {/* Main Reception Workspace */}
+            <main className="flex-1 min-w-0 p-6 lg:p-8 xl:p-10 grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
                     {/* Center 8 Columns: Active Queue + Walk-In & Reservation Check-In */}
                     <div className="xl:col-span-8 space-y-6">
                         <div>
@@ -551,7 +566,6 @@ export default function StaffReceptionPortal({ notify }) {
                     </div>
                 </main>
             </div>
-        </div>
     );
 }
 

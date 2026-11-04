@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import CarePointLogo from '../components/CarePointLogo';
+import PortalSidebarNav from '../components/PortalSidebarNav';
 import { DashboardPortalSkeleton } from '../components/SkeletonLoaders';
 import { cachedFetchJson, invalidateClientCache } from '../utils/apiCache';
 import {
@@ -7,17 +9,18 @@ import {
     Clock,
     UserCog,
     CheckCircle2,
-    Play,
-    PhoneCall,
-    FileText,
-    Calendar,
     Save,
-    Pill,
 } from 'lucide-react';
 
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-export default function DoctorPortal({ notify }) {
+export default function DoctorPortal({
+    notify,
+    authSession,
+    activePortal,
+    onSwitchPortal,
+    onLogout,
+}) {
     const [data, setData] = useState(null);
     const [selectedDoctorId, setSelectedDoctorId] = useState('');
     const [activeTab, setActiveTab] = useState('patients'); // patients, schedule, profile
@@ -230,85 +233,90 @@ export default function DoctorPortal({ notify }) {
     const appointments = data?.appointments || [];
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-            <div className="bg-slate-100 rounded-2xl shadow-xl border border-slate-200 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[78vh]">
-                {/* Left Sidebar */}
-                <aside className="lg:col-span-3 xl:col-span-2 bg-slate-900 text-slate-200 p-4 flex flex-col justify-between">
-                    <div className="space-y-6">
-                        <div className="border-b border-slate-800 pb-4">
-                            <div className="text-xs font-bold uppercase tracking-wider text-teal-400">
-                                Physician Console
-                            </div>
-                            <div className="text-base font-extrabold text-white mt-1">
-                                {doctor?.name}
-                            </div>
-                            <div className="text-xs text-slate-400 mt-0.5">
-                                {doctor?.room_number} • {doctor?.specialty}
-                            </div>
-
-                            {/* Switch Active Doctor Account */}
-                            <div className="mt-3">
-                                <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">
-                                    Switch Doctor View
-                                </label>
-                                <select
-                                    value={selectedDoctorId}
-                                    onChange={(e) => handleSwitchDoctor(e.target.value)}
-                                    className="w-full rounded-lg bg-slate-800 border border-slate-700 text-xs text-white px-2.5 py-1.5 focus:outline-none focus:border-teal-500"
-                                >
-                                    {(data?.all_doctors || []).map((d) => (
-                                        <option key={d.id} value={d.id}>
-                                            {d.name} ({d.room_number})
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <nav className="space-y-1.5">
-                            <button
-                                type="button"
-                                onClick={() => setActiveTab('patients')}
-                                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                                    activeTab === 'patients'
-                                        ? 'bg-teal-600 text-white shadow-sm'
-                                        : 'text-slate-300 hover:bg-slate-800'
-                                }`}
-                            >
-                                <Users className="w-4 h-4" />
-                                <span>My Patients & Queue</span>
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => setActiveTab('schedule')}
-                                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                                    activeTab === 'schedule'
-                                        ? 'bg-teal-600 text-white shadow-sm'
-                                        : 'text-slate-300 hover:bg-slate-800'
-                                }`}
-                            >
-                                <Clock className="w-4 h-4" />
-                                <span>Edit Clinic Hours</span>
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => setActiveTab('profile')}
-                                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                                    activeTab === 'profile'
-                                        ? 'bg-teal-600 text-white shadow-sm'
-                                        : 'text-slate-300 hover:bg-slate-800'
-                                }`}
-                            >
-                                <UserCog className="w-4 h-4" />
-                                <span>Edit My Details</span>
-                            </button>
-                        </nav>
+        <div className="min-h-screen w-full flex flex-col lg:flex-row bg-slate-100">
+            {/* Full-Height Left Sidebar */}
+            <aside className="w-full lg:w-72 xl:w-80 bg-slate-900 text-slate-200 p-5 flex flex-col justify-between shrink-0 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto border-r border-slate-800">
+                <div className="space-y-5">
+                    <div className="pb-4 border-b border-slate-800">
+                        <CarePointLogo dark size="sm" />
                     </div>
 
-                    <div className="bg-slate-800/80 rounded-xl p-3.5 border border-slate-700 text-xs space-y-1.5">
-                        <div className="text-[11px] font-bold text-teal-300 uppercase">Current Shift</div>
+                    <div className="border-b border-slate-800 pb-4">
+                        <div className="text-[11px] font-extrabold uppercase tracking-wider text-teal-400">
+                            Physician Console
+                        </div>
+                        <div className="text-base font-extrabold text-white mt-1">
+                            {doctor?.name}
+                        </div>
+                        <div className="text-xs text-slate-400 mt-0.5">
+                            {doctor?.room_number} • {doctor?.specialty}
+                        </div>
+
+                        {/* Switch Active Doctor Account */}
+                        <div className="mt-3">
+                            <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">
+                                Switch Doctor View
+                            </label>
+                            <select
+                                value={selectedDoctorId}
+                                onChange={(e) => handleSwitchDoctor(e.target.value)}
+                                className="w-full rounded-lg bg-slate-800 border border-slate-700 text-xs text-white px-3 py-2 focus:outline-none focus:border-teal-500"
+                            >
+                                {(data?.all_doctors || []).map((d) => (
+                                    <option key={d.id} value={d.id}>
+                                        {d.name} ({d.room_number})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    <nav className="space-y-1.5">
+                        <div className="px-2 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                            Doctor Workspace
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('patients')}
+                            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeTab === 'patients'
+                                    ? 'bg-teal-600 text-white shadow-sm'
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
+                        >
+                            <Users className="w-4 h-4 shrink-0" />
+                            <span>My Patients & Queue</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('schedule')}
+                            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeTab === 'schedule'
+                                    ? 'bg-teal-600 text-white shadow-sm'
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
+                        >
+                            <Clock className="w-4 h-4 shrink-0" />
+                            <span>Edit Clinic Hours</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('profile')}
+                            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeTab === 'profile'
+                                    ? 'bg-teal-600 text-white shadow-sm'
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
+                        >
+                            <UserCog className="w-4 h-4 shrink-0" />
+                            <span>Edit My Details</span>
+                        </button>
+                    </nav>
+
+                    <div className="bg-slate-800/80 rounded-xl p-3.5 border border-slate-700 text-xs space-y-1">
+                        <div className="text-[10px] font-bold text-teal-300 uppercase">Current Shift</div>
                         <div className="font-bold text-white">
                             {doctor?.shift_start} – {doctor?.shift_end}
                         </div>
@@ -316,37 +324,46 @@ export default function DoctorPortal({ notify }) {
                             License: {doctor?.license_number}
                         </div>
                     </div>
-                </aside>
+                </div>
 
-                {/* Main Content */}
-                <main className="lg:col-span-9 xl:col-span-10 p-6 space-y-6">
-                    {/* Top Doctor Header & KPI Cards */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-2xs">
-                            <div className="text-xs font-semibold text-slate-500">Assigned Today</div>
-                            <div className="text-3xl font-black text-slate-900 mt-1">
-                                {data?.stats?.total_patients_today ?? 0}
-                            </div>
-                        </div>
-                        <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-2xs">
-                            <div className="text-xs font-semibold text-slate-500">Waiting for Me</div>
-                            <div className="text-3xl font-black text-teal-700 mt-1">
-                                {data?.stats?.waiting_for_me ?? 0}
-                            </div>
-                        </div>
-                        <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-2xs">
-                            <div className="text-xs font-semibold text-slate-500">In Consultation</div>
-                            <div className="text-3xl font-black text-blue-600 mt-1">
-                                {data?.stats?.currently_serving ?? 0}
-                            </div>
-                        </div>
-                        <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-2xs">
-                            <div className="text-xs font-semibold text-slate-500">Completed Today</div>
-                            <div className="text-3xl font-black text-emerald-600 mt-1">
-                                {data?.stats?.completed_today ?? 0}
-                            </div>
+                {/* Portal Switcher & Sign Out in Left Sidebar */}
+                <PortalSidebarNav
+                    authSession={authSession}
+                    activePortal={activePortal}
+                    onSwitchPortal={onSwitchPortal}
+                    onLogout={onLogout}
+                />
+            </aside>
+
+            {/* Main Full-Width Content Area */}
+            <main className="flex-1 min-w-0 p-6 lg:p-8 xl:p-10 space-y-6">
+                {/* Top Doctor Header & KPI Cards */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
+                        <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Assigned Today</div>
+                        <div className="text-3xl sm:text-4xl font-black text-slate-900 mt-1.5">
+                            {data?.stats?.total_patients_today ?? 0}
                         </div>
                     </div>
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
+                        <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Waiting for Me</div>
+                        <div className="text-3xl sm:text-4xl font-black text-teal-700 mt-1.5">
+                            {data?.stats?.waiting_for_me ?? 0}
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
+                        <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">In Consultation</div>
+                        <div className="text-3xl sm:text-4xl font-black text-blue-600 mt-1.5">
+                            {data?.stats?.currently_serving ?? 0}
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
+                        <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Completed Today</div>
+                        <div className="text-3xl sm:text-4xl font-black text-emerald-600 mt-1.5">
+                            {data?.stats?.completed_today ?? 0}
+                        </div>
+                    </div>
+                </div>
 
                     {/* TAB 1: MY PATIENTS & CLINICAL CONSULTATION */}
                     {activeTab === 'patients' && (
@@ -533,308 +550,372 @@ export default function DoctorPortal({ notify }) {
 
                     {/* TAB 2: EDIT DOCTOR'S TIME IN CLINIC & SCHEDULE */}
                     {activeTab === 'schedule' && (
-                        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 max-w-3xl">
-                            <div className="border-b border-slate-100 pb-4 mb-6">
-                                <h3 className="text-lg font-extrabold text-slate-900">
-                                    Edit My Clinic Schedule & Live Availability
-                                </h3>
-                                <p className="text-xs text-slate-500 mt-0.5">
-                                    Changes immediately update the Patient Reservation Portal, Reception Desk, and Admin Dashboard.
-                                </p>
+                        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+                            <div className="xl:col-span-8 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+                                <div className="border-b border-slate-100 pb-4 mb-6">
+                                    <h3 className="text-xl font-extrabold text-slate-900">
+                                        Edit My Clinic Schedule & Live Availability
+                                    </h3>
+                                    <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                                        Changes immediately update the Patient Reservation Portal, Reception Desk, and Admin Dashboard.
+                                    </p>
+                                </div>
+
+                                <form onSubmit={handleSaveSchedule} className="space-y-6">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                                Live Availability Status
+                                            </label>
+                                            <select
+                                                value={scheduleForm.availability_status}
+                                                onChange={(e) =>
+                                                    setScheduleForm({ ...scheduleForm, availability_status: e.target.value })
+                                                }
+                                                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 focus:border-teal-600 focus:outline-none"
+                                            >
+                                                <option value="active">🟢 Active / Available in Clinic</option>
+                                                <option value="in_consultation">🔵 In Consultation</option>
+                                                <option value="on_break">🟡 On Break / Rounds</option>
+                                                <option value="offline">🔴 Offline / Off-Duty</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                                Assigned Clinic Room
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={scheduleForm.room_number}
+                                                onChange={(e) =>
+                                                    setScheduleForm({ ...scheduleForm, room_number: e.target.value })
+                                                }
+                                                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 focus:border-teal-600 focus:outline-none"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                                Clinic Shift Start Time
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={scheduleForm.shift_start}
+                                                onChange={(e) =>
+                                                    setScheduleForm({ ...scheduleForm, shift_start: e.target.value })
+                                                }
+                                                placeholder="08:00 AM"
+                                                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-teal-600 focus:outline-none"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                                Clinic Shift End Time
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={scheduleForm.shift_end}
+                                                onChange={(e) =>
+                                                    setScheduleForm({ ...scheduleForm, shift_end: e.target.value })
+                                                }
+                                                placeholder="05:00 PM"
+                                                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-teal-600 focus:outline-none"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                                Slot Duration (Minutes)
+                                            </label>
+                                            <select
+                                                value={scheduleForm.slot_duration_minutes}
+                                                onChange={(e) =>
+                                                    setScheduleForm({
+                                                        ...scheduleForm,
+                                                        slot_duration_minutes: Number(e.target.value),
+                                                    })
+                                                }
+                                                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-teal-600 focus:outline-none"
+                                            >
+                                                <option value={15}>15 mins</option>
+                                                <option value={20}>20 mins</option>
+                                                <option value={30}>30 mins</option>
+                                                <option value={45}>45 mins</option>
+                                                <option value={60}>60 mins</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-700 mb-2">
+                                            Working Days in Clinic
+                                        </label>
+                                        <div className="flex flex-wrap gap-2.5">
+                                            {DAYS_OF_WEEK.map((day) => {
+                                                const active = (scheduleForm.working_days || []).includes(day);
+                                                return (
+                                                    <button
+                                                        key={day}
+                                                        type="button"
+                                                        onClick={() => toggleWorkingDay(day)}
+                                                        className={`px-5 py-2.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
+                                                            active
+                                                                ? 'bg-teal-700 text-white border-teal-700 shadow-2xs'
+                                                                : 'bg-slate-50 text-slate-600 border-slate-300 hover:bg-slate-100'
+                                                        }`}
+                                                    >
+                                                        {day}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-4 border-t border-slate-100 flex justify-end">
+                                        <button
+                                            type="submit"
+                                            disabled={saving}
+                                            className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-bold shadow-sm transition cursor-pointer"
+                                        >
+                                            <Save className="w-4 h-4" />
+                                            <span>{saving ? 'Saving Schedule...' : 'Save Clinic Hours & Availability'}</span>
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
 
-                            <form onSubmit={handleSaveSchedule} className="space-y-5">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                                            Live Availability Status
-                                        </label>
-                                        <select
-                                            value={scheduleForm.availability_status}
-                                            onChange={(e) =>
-                                                setScheduleForm({ ...scheduleForm, availability_status: e.target.value })
-                                            }
-                                            className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:border-teal-600 focus:outline-none"
-                                        >
-                                            <option value="active">🟢 Active / Available in Clinic</option>
-                                            <option value="in_consultation">🔵 In Consultation</option>
-                                            <option value="on_break">🟡 On Break / Rounds</option>
-                                            <option value="offline">🔴 Offline / Off-Duty</option>
-                                        </select>
+                            <div className="xl:col-span-4 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+                                <div className="text-xs font-extrabold uppercase tracking-wider text-teal-700">
+                                    Live Schedule Summary
+                                </div>
+                                <h4 className="text-lg font-black text-slate-900">
+                                    {doctor?.name}
+                                </h4>
+                                <div className="space-y-2.5 text-xs text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                    <div className="flex justify-between">
+                                        <span className="font-semibold">Assigned Room:</span>
+                                        <span className="font-extrabold text-slate-900">{scheduleForm.room_number}</span>
                                     </div>
-
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                                            Assigned Clinic Room
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={scheduleForm.room_number}
-                                            onChange={(e) =>
-                                                setScheduleForm({ ...scheduleForm, room_number: e.target.value })
-                                            }
-                                            className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:border-teal-600 focus:outline-none"
-                                        />
+                                    <div className="flex justify-between">
+                                        <span className="font-semibold">Clinic Shift:</span>
+                                        <span className="font-extrabold text-slate-900">
+                                            {scheduleForm.shift_start} – {scheduleForm.shift_end}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="font-semibold">Slot Interval:</span>
+                                        <span className="font-extrabold text-teal-700">
+                                            Every {scheduleForm.slot_duration_minutes} mins
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="font-semibold">Active Days:</span>
+                                        <span className="font-extrabold text-slate-900">
+                                            {(scheduleForm.working_days || []).join(', ')}
+                                        </span>
                                     </div>
                                 </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                                            Clinic Shift Start Time
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={scheduleForm.shift_start}
-                                            onChange={(e) =>
-                                                setScheduleForm({ ...scheduleForm, shift_start: e.target.value })
-                                            }
-                                            placeholder="08:00 AM"
-                                            className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm focus:border-teal-600 focus:outline-none"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                                            Clinic Shift End Time
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={scheduleForm.shift_end}
-                                            onChange={(e) =>
-                                                setScheduleForm({ ...scheduleForm, shift_end: e.target.value })
-                                            }
-                                            placeholder="05:00 PM"
-                                            className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm focus:border-teal-600 focus:outline-none"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                                            Slot Duration (Minutes)
-                                        </label>
-                                        <select
-                                            value={scheduleForm.slot_duration_minutes}
-                                            onChange={(e) =>
-                                                setScheduleForm({
-                                                    ...scheduleForm,
-                                                    slot_duration_minutes: Number(e.target.value),
-                                                })
-                                            }
-                                            className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm focus:border-teal-600 focus:outline-none"
-                                        >
-                                            <option value={15}>15 mins</option>
-                                            <option value={20}>20 mins</option>
-                                            <option value={30}>30 mins</option>
-                                            <option value={45}>45 mins</option>
-                                            <option value={60}>60 mins</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-700 mb-2">
-                                        Working Days in Clinic
-                                    </label>
-                                    <div className="flex flex-wrap gap-2">
-                                        {DAYS_OF_WEEK.map((day) => {
-                                            const active = (scheduleForm.working_days || []).includes(day);
-                                            return (
-                                                <button
-                                                    key={day}
-                                                    type="button"
-                                                    onClick={() => toggleWorkingDay(day)}
-                                                    className={`px-4 py-2 rounded-lg text-xs font-bold border transition cursor-pointer ${
-                                                        active
-                                                            ? 'bg-teal-700 text-white border-teal-700 shadow-2xs'
-                                                            : 'bg-slate-50 text-slate-600 border-slate-300 hover:bg-slate-100'
-                                                    }`}
-                                                >
-                                                    {day}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-
-                                <div className="pt-4 border-t border-slate-100 flex justify-end">
-                                    <button
-                                        type="submit"
-                                        disabled={saving}
-                                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold shadow-sm transition cursor-pointer"
-                                    >
-                                        <Save className="w-4 h-4" />
-                                        <span>{saving ? 'Saving Schedule...' : 'Save Clinic Hours & Availability'}</span>
-                                    </button>
-                                </div>
-                            </form>
+                            </div>
                         </div>
                     )}
 
                     {/* TAB 3: EDIT DOCTOR PERSONAL & PROFESSIONAL DETAILS */}
                     {activeTab === 'profile' && (
-                        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 max-w-3xl">
-                            <div className="border-b border-slate-100 pb-4 mb-6">
-                                <h3 className="text-lg font-extrabold text-slate-900">
-                                    Edit Doctor Profile & Credentials
-                                </h3>
-                                <p className="text-xs text-slate-500 mt-0.5">
-                                    Update your display name, specialty, medical license number, contact info, and biography.
-                                </p>
+                        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+                            <div className="xl:col-span-8 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+                                <div className="border-b border-slate-100 pb-4 mb-6">
+                                    <h3 className="text-xl font-extrabold text-slate-900">
+                                        Edit Doctor Profile & Credentials
+                                    </h3>
+                                    <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                                        Update your display name, specialty, medical license number, contact info, and biography.
+                                    </p>
+                                </div>
+
+                                <form onSubmit={handleSaveProfile} className="space-y-5">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                                Doctor Full Name *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={profileForm.name}
+                                                onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+                                                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-600 focus:outline-none"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                                Department *
+                                            </label>
+                                            <select
+                                                value={profileForm.department_id}
+                                                onChange={(e) =>
+                                                    setProfileForm({ ...profileForm, department_id: e.target.value })
+                                                }
+                                                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-600 focus:outline-none"
+                                            >
+                                                {(data?.departments || []).map((dept) => (
+                                                    <option key={dept.id} value={dept.id}>
+                                                        {dept.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                                Specialty Title *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={profileForm.specialty}
+                                                onChange={(e) =>
+                                                    setProfileForm({ ...profileForm, specialty: e.target.value })
+                                                }
+                                                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-600 focus:outline-none"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                                Medical License No. *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={profileForm.license_number}
+                                                onChange={(e) =>
+                                                    setProfileForm({ ...profileForm, license_number: e.target.value })
+                                                }
+                                                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-600 focus:outline-none"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                                Consultation Fee (₱)
+                                            </label>
+                                            <input
+                                                type="number"
+                                                step="0.01"
+                                                value={profileForm.consultation_fee}
+                                                onChange={(e) =>
+                                                    setProfileForm({ ...profileForm, consultation_fee: e.target.value })
+                                                }
+                                                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-600 focus:outline-none"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                                Email Address *
+                                            </label>
+                                            <input
+                                                type="email"
+                                                required
+                                                value={profileForm.email}
+                                                onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
+                                                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-600 focus:outline-none"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                                Contact Phone
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={profileForm.phone}
+                                                onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                                                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-600 focus:outline-none"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                                Room Assignment *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={profileForm.room_number}
+                                                onChange={(e) =>
+                                                    setProfileForm({ ...profileForm, room_number: e.target.value })
+                                                }
+                                                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-teal-600 focus:outline-none"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                            Professional Biography & Credentials
+                                        </label>
+                                        <textarea
+                                            rows={4}
+                                            value={profileForm.bio}
+                                            onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
+                                            className="w-full rounded-xl border border-slate-300 p-3.5 text-sm focus:border-teal-600 focus:outline-none"
+                                        />
+                                    </div>
+
+                                    <div className="pt-3 border-t border-slate-100 flex justify-end">
+                                        <button
+                                            type="submit"
+                                            disabled={saving}
+                                            className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-bold shadow-sm transition cursor-pointer"
+                                        >
+                                            <Save className="w-4 h-4" />
+                                            <span>{saving ? 'Saving Details...' : 'Save Doctor Details'}</span>
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
 
-                            <form onSubmit={handleSaveProfile} className="space-y-4">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                                            Doctor Full Name *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={profileForm.name}
-                                            onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                                            className="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm focus:border-teal-600 focus:outline-none"
-                                        />
+                            <div className="xl:col-span-4 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+                                <div className="text-xs font-extrabold uppercase tracking-wider text-teal-700">
+                                    Public Directory Card Preview
+                                </div>
+                                <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div>
+                                            <div className="text-base font-black text-slate-900">
+                                                {profileForm.name || 'Doctor Name'}
+                                            </div>
+                                            <div className="text-xs font-bold text-[#13467b]">
+                                                {profileForm.specialty || 'Specialty'}
+                                            </div>
+                                        </div>
+                                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800">
+                                            {profileForm.room_number || 'ROOM 1'}
+                                        </span>
                                     </div>
-
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                                            Department *
-                                        </label>
-                                        <select
-                                            value={profileForm.department_id}
-                                            onChange={(e) =>
-                                                setProfileForm({ ...profileForm, department_id: e.target.value })
-                                            }
-                                            className="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm focus:border-teal-600 focus:outline-none"
-                                        >
-                                            {(data?.departments || []).map((dept) => (
-                                                <option key={dept.id} value={dept.id}>
-                                                    {dept.name}
-                                                </option>
-                                            ))}
-                                        </select>
+                                    <p className="text-xs text-slate-600 leading-relaxed">
+                                        {profileForm.bio || 'No biography entered yet.'}
+                                    </p>
+                                    <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-500">
+                                        <span>License: {profileForm.license_number}</span>
+                                        <span className="font-bold text-teal-700">₱{profileForm.consultation_fee}</span>
                                     </div>
                                 </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                                            Specialty Title *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={profileForm.specialty}
-                                            onChange={(e) =>
-                                                setProfileForm({ ...profileForm, specialty: e.target.value })
-                                            }
-                                            className="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm focus:border-teal-600 focus:outline-none"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                                            Medical License No. *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={profileForm.license_number}
-                                            onChange={(e) =>
-                                                setProfileForm({ ...profileForm, license_number: e.target.value })
-                                            }
-                                            className="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm focus:border-teal-600 focus:outline-none"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                                            Consultation Fee ($)
-                                        </label>
-                                        <input
-                                            type="number"
-                                            step="0.01"
-                                            value={profileForm.consultation_fee}
-                                            onChange={(e) =>
-                                                setProfileForm({ ...profileForm, consultation_fee: e.target.value })
-                                            }
-                                            className="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm focus:border-teal-600 focus:outline-none"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                                            Email Address *
-                                        </label>
-                                        <input
-                                            type="email"
-                                            required
-                                            value={profileForm.email}
-                                            onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
-                                            className="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm focus:border-teal-600 focus:outline-none"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                                            Contact Phone
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={profileForm.phone}
-                                            onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-                                            className="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm focus:border-teal-600 focus:outline-none"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                                            Room Assignment *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={profileForm.room_number}
-                                            onChange={(e) =>
-                                                setProfileForm({ ...profileForm, room_number: e.target.value })
-                                            }
-                                            className="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm focus:border-teal-600 focus:outline-none"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                                        Professional Biography & Credentials
-                                    </label>
-                                    <textarea
-                                        rows={3}
-                                        value={profileForm.bio}
-                                        onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
-                                        className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:border-teal-600 focus:outline-none"
-                                    />
-                                </div>
-
-                                <div className="pt-3 border-t border-slate-100 flex justify-end">
-                                    <button
-                                        type="submit"
-                                        disabled={saving}
-                                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold shadow-sm transition cursor-pointer"
-                                    >
-                                        <Save className="w-4 h-4" />
-                                        <span>{saving ? 'Saving Details...' : 'Save Doctor Details'}</span>
-                                    </button>
-                                </div>
-                            </form>
+                            </div>
                         </div>
                     )}
                 </main>
             </div>
-        </div>
     );
 }
 

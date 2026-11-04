@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import CarePointLogo from '../components/CarePointLogo';
-import { ArrowRight, RefreshCw, Volume2 } from 'lucide-react';
+import PortalSidebarNav from '../components/PortalSidebarNav';
+import { ArrowRight, RefreshCw, Volume2, Maximize2, Minimize2 } from 'lucide-react';
 
-export default function TvQueuePortal() {
+export default function TvQueuePortal({
+    authSession,
+    activePortal,
+    onSwitchPortal,
+    onLogout,
+}) {
     const [catalog, setCatalog] = useState(null);
     const [clock, setClock] = useState('');
+    const [hideSidebar, setHideSidebar] = useState(false);
 
     const fetchQueue = async () => {
         try {
@@ -42,21 +49,80 @@ export default function TvQueuePortal() {
     const upcoming = catalog?.queue?.upcoming || [];
     const tickerNews =
         catalog?.ticker_news ||
-        'Flu vaccines are now available. Inquiry at the reception desk. • Please keep your ticket number ready when called.';
+        'Welcome to Labcure Laboratory & Medical Services Inc. (Calapan City, Oriental Mindoro) • Please keep your ticket number ready when called.';
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-            {/* Outer TV Bezel Frame matching Mockup Top-Right */}
-            <div className="rounded-2xl bg-slate-900 p-3 shadow-2xl border-4 border-slate-800">
-                <div className="rounded-xl bg-white overflow-hidden flex flex-col min-h-[76vh]">
-                    {/* Top TV Banner: CarePoint Clinic + Huge Clock (02:45 PM) */}
-                    <div className="bg-gradient-to-r from-teal-50 via-cyan-50 to-teal-100 px-8 py-5 border-b border-slate-300 flex items-center justify-between">
-                        <CarePointLogo size="lg" />
-                        <div className="flex items-center gap-5">
+        <div className="min-h-screen w-full flex flex-col lg:flex-row bg-slate-950">
+            {/* Left Sidebar (Collapsible for Lobby Monitor Fullscreen) */}
+            {!hideSidebar && (
+                <aside className="w-full lg:w-64 xl:w-72 bg-slate-900 text-slate-200 p-5 flex flex-col justify-between shrink-0 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto border-r border-slate-800">
+                    <div className="space-y-5">
+                        <div className="pb-4 border-b border-slate-800">
+                            <CarePointLogo dark size="sm" />
+                        </div>
+
+                        <div className="space-y-2 border-b border-slate-800 pb-4">
+                            <div className="text-[11px] font-extrabold uppercase tracking-wider text-teal-400">
+                                Queuing TV Display
+                            </div>
+                            <div className="text-sm font-extrabold text-white">
+                                Lobby Monitor Console
+                            </div>
+                            <p className="text-xs text-slate-400">
+                                Auto-polls live queue status every 5 seconds.
+                            </p>
+                        </div>
+
+                        <div className="space-y-2">
                             <button
                                 type="button"
                                 onClick={fetchQueue}
-                                className="p-2 rounded-lg bg-white/80 hover:bg-white text-slate-600 border border-slate-200 transition cursor-pointer"
+                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition cursor-pointer"
+                            >
+                                <RefreshCw className="w-4 h-4 text-teal-400" />
+                                <span>Refresh Queue Now</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setHideSidebar(true)}
+                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg bg-teal-600/20 hover:bg-teal-600/30 border border-teal-500/30 text-xs font-bold text-teal-300 transition cursor-pointer"
+                            >
+                                <Maximize2 className="w-4 h-4" />
+                                <span>Fullscreen TV Mode</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <PortalSidebarNav
+                        authSession={authSession}
+                        activePortal={activePortal}
+                        onSwitchPortal={onSwitchPortal}
+                        onLogout={onLogout}
+                    />
+                </aside>
+            )}
+
+            {/* Full-Viewport TV Display */}
+            <main className="flex-1 min-w-0 p-3 sm:p-5 flex flex-col min-h-screen">
+                <div className="rounded-2xl bg-white overflow-hidden flex flex-col flex-1 shadow-2xl border-2 border-slate-800">
+                    {/* Top TV Banner: Labcure Logo + Huge Clock */}
+                    <div className="bg-gradient-to-r from-teal-50 via-cyan-50 to-teal-100 px-8 py-5 border-b border-slate-300 flex items-center justify-between">
+                        <CarePointLogo size="lg" />
+                        <div className="flex items-center gap-4">
+                            {hideSidebar && (
+                                <button
+                                    type="button"
+                                    onClick={() => setHideSidebar(false)}
+                                    className="px-3.5 py-2 rounded-lg bg-slate-900 text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                                >
+                                    <Minimize2 className="w-3.5 h-3.5" />
+                                    <span>Show Sidebar</span>
+                                </button>
+                            )}
+                            <button
+                                type="button"
+                                onClick={fetchQueue}
+                                className="p-2.5 rounded-lg bg-white/80 hover:bg-white text-slate-600 border border-slate-200 transition cursor-pointer"
                                 title="Refresh Live Display"
                             >
                                 <RefreshCw className="w-4 h-4" />
@@ -69,14 +135,14 @@ export default function TvQueuePortal() {
 
                     {/* Subheader Bar: NOW SERVING | UPCOMING QUEUE */}
                     <div className="grid grid-cols-12 bg-slate-900 text-white font-extrabold text-sm sm:text-base tracking-wider uppercase">
-                        <div className="col-span-12 lg:col-span-8 px-8 py-3 border-b lg:border-b-0 lg:border-r border-slate-700 flex items-center justify-between">
+                        <div className="col-span-12 lg:col-span-8 px-8 py-3.5 border-b lg:border-b-0 lg:border-r border-slate-700 flex items-center justify-between">
                             <span>NOW SERVING</span>
                             <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 normal-case">
                                 <Volume2 className="w-4 h-4 animate-bounce" />
                                 Audio Chime Active
                             </span>
                         </div>
-                        <div className="col-span-12 lg:col-span-4 px-8 py-3 bg-slate-800 text-center">
+                        <div className="col-span-12 lg:col-span-4 px-8 py-3.5 bg-slate-800 text-center">
                             UPCOMING QUEUE
                         </div>
                     </div>
@@ -114,7 +180,7 @@ export default function TvQueuePortal() {
                             )}
                         </div>
 
-                        {/* Right 4 Cols: UPCOMING QUEUE List (G-105 ROOM 1, A-103 ROOM 1, C-301 ROOM 3, B-205 ROOM 2, G-106 ROOM 3) */}
+                        {/* Right 4 Cols: UPCOMING QUEUE List */}
                         <div className="col-span-12 lg:col-span-4 bg-slate-100 p-6 space-y-3 overflow-y-auto">
                             {upcoming.length === 0 ? (
                                 <div className="text-center py-12 text-slate-400 font-semibold">
@@ -162,8 +228,7 @@ export default function TvQueuePortal() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
     );
 }
-

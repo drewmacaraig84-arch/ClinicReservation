@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import CarePointLogo from '../components/CarePointLogo';
+import PortalSidebarNav from '../components/PortalSidebarNav';
 import { DashboardPortalSkeleton } from '../components/SkeletonLoaders';
 import { cachedFetchJson, getRbacHeaders, invalidateClientCache } from '../utils/apiCache';
 import {
     ShieldAlert,
     Activity,
     Database,
-    Server,
     Terminal,
     Trash2,
     RotateCcw,
-    CheckCircle2,
-    AlertTriangle,
-    Lock,
-    Cpu,
-    HardDrive,
-    Zap,
     RefreshCw,
-    Flame,
 } from 'lucide-react';
 
-export default function SuperAdminPortal({ notify }) {
+export default function SuperAdminPortal({
+    notify,
+    authSession,
+    activePortal,
+    onSwitchPortal,
+    onLogout,
+}) {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('health'); // health, crashlogs, vault, security
@@ -204,81 +204,110 @@ export default function SuperAdminPortal({ notify }) {
     const softDeleted = data?.soft_deleted || {};
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-            <div className="bg-slate-950 text-slate-100 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden min-h-[82vh]">
-                {/* Top Command Header */}
-                <header className="bg-slate-900/90 border-b border-slate-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
-                            <ShieldAlert className="w-5 h-5 text-emerald-400" />
-                        </div>
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <h1 className="text-lg font-black tracking-tight text-white">
-                                    SUPER ADMIN OBSERVATORY
-                                </h1>
-                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                                    {health.overall_status || 'HEALTHY'} • {health.uptime_percentage}% Uptime
-                                </span>
-                            </div>
-                            <p className="text-xs text-slate-400">
-                                System Health • Crash Logs & Stack Traces • Soft-Deleted Data Recovery Vault • WAF, Rate Limiter & Load Balancer
-                            </p>
-                        </div>
+        <div className="min-h-screen w-full flex flex-col lg:flex-row bg-slate-950 text-slate-100">
+            {/* Full-Height Left Sidebar */}
+            <aside className="w-full lg:w-72 xl:w-80 bg-slate-900 border-r border-slate-800 p-5 flex flex-col justify-between shrink-0 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
+                <div className="space-y-5">
+                    <div className="pb-4 border-b border-slate-800">
+                        <CarePointLogo dark size="sm" />
                     </div>
 
-                    {/* Navigation Pills */}
-                    <div className="flex flex-wrap items-center gap-1.5">
+                    <div className="border-b border-slate-800 pb-4 space-y-2">
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0">
+                                <ShieldAlert className="w-4 h-4 text-emerald-400" />
+                            </div>
+                            <div>
+                                <div className="text-sm font-black tracking-tight text-white">
+                                    SUPER ADMIN
+                                </div>
+                                <div className="text-[10px] font-bold text-emerald-400">
+                                    {health.overall_status || 'HEALTHY'} • {health.uptime_percentage}% Uptime
+                                </div>
+                            </div>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                            System Health, Crash Logs, Soft-Deleted Vault & Zero-Trust WAF Telemetry
+                        </p>
+                    </div>
+
+                    <nav className="space-y-1.5">
+                        <div className="px-2 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                            Observatory Modules
+                        </div>
                         <button
                             type="button"
                             onClick={() => setActiveTab('health')}
-                            className={`px-3.5 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'health'
+                            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeTab === 'health'
                                     ? 'bg-emerald-600 text-white shadow-sm'
-                                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                                }`}
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
                         >
-                            System Health & Load Balancer
+                            <Activity className="w-4 h-4 shrink-0" />
+                            <span>System Health & Cluster</span>
                         </button>
+
                         <button
                             type="button"
                             onClick={() => setActiveTab('crashlogs')}
-                            className={`px-3.5 py-2 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${activeTab === 'crashlogs'
+                            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeTab === 'crashlogs'
                                     ? 'bg-emerald-600 text-white shadow-sm'
-                                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                                }`}
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
                         >
-                            <span>Crash Logs & WAF Telemetry</span>
+                            <span className="flex items-center gap-3">
+                                <Terminal className="w-4 h-4 shrink-0" />
+                                <span>Crash Logs & WAF</span>
+                            </span>
                             {logCounts.unresolved_crashes > 0 && (
                                 <span className="px-1.5 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-black">
                                     {logCounts.unresolved_crashes}
                                 </span>
                             )}
                         </button>
+
                         <button
                             type="button"
                             onClick={() => setActiveTab('vault')}
-                            className={`px-3.5 py-2 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${activeTab === 'vault'
+                            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                activeTab === 'vault'
                                     ? 'bg-emerald-600 text-white shadow-sm'
-                                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                                }`}
+                                    : 'text-slate-300 hover:bg-slate-800'
+                            }`}
                         >
-                            <span>Soft-Deleted Data Vault</span>
+                            <span className="flex items-center gap-3">
+                                <Database className="w-4 h-4 shrink-0" />
+                                <span>Soft-Deleted Vault</span>
+                            </span>
                             <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black">
                                 {softDeleted.total_trashed ?? 0}
                             </span>
                         </button>
+
                         <button
                             type="button"
-                            onClick={() => fetchSuperAdmin(logLevel)}
-                            className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer"
-                            title="Refresh Telemetry"
+                            onClick={() => fetchSuperAdmin(logLevel, true)}
+                            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800 transition cursor-pointer"
                         >
-                            <RefreshCw className="w-4 h-4" />
+                            <RefreshCw className="w-4 h-4 text-teal-400 shrink-0" />
+                            <span>Refresh Telemetry</span>
                         </button>
-                    </div>
-                </header>
+                    </nav>
+                </div>
 
-                <div className="p-6 space-y-6">
+                {/* Portal Switcher & Sign Out in Left Sidebar */}
+                <PortalSidebarNav
+                    authSession={authSession}
+                    activePortal={activePortal}
+                    onSwitchPortal={onSwitchPortal}
+                    onLogout={onLogout}
+                />
+            </aside>
+
+            {/* Main Observatory Workspace */}
+            <main className="flex-1 min-w-0 p-6 lg:p-8 xl:p-10 space-y-6">
                     {/* Top Telemetry Strip */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
                         <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
@@ -813,9 +842,8 @@ export default function SuperAdminPortal({ notify }) {
                             )}
                         </div>
                     )}
-                </div>
+                </main>
             </div>
-        </div>
     );
 }
 

@@ -7,60 +7,18 @@ import DoctorPortal from './portals/DoctorPortal';
 import AdminPortal from './portals/AdminPortal';
 import SuperAdminPortal from './portals/SuperAdminPortal';
 import LegalAndConsentSuite from './components/LegalAndConsentSuite';
-import {
-    PORTAL_ROLE_DEFINITIONS,
-    PortalLoginModal,
-} from './components/RbacSuite';
+import CarePointLogo from './components/CarePointLogo';
+import PortalSidebarNav from './components/PortalSidebarNav';
+import { PortalLoginModal } from './components/RbacSuite';
 import {
     getAuthSession,
     setAuthSession,
     clearAuthSession,
 } from './utils/apiCache';
 import {
-    Globe,
-    Tv,
-    UserCheck,
-    Stethoscope,
-    LayoutDashboard,
-    ShieldAlert,
     CheckCircle2,
     AlertCircle,
-    LogOut,
-    User,
 } from 'lucide-react';
-
-const PORTALS = [
-    {
-        id: 'client',
-        label: 'Client Website',
-        icon: Globe,
-    },
-    {
-        id: 'tv',
-        label: 'Queuing TV Display',
-        icon: Tv,
-    },
-    {
-        id: 'staff',
-        label: 'Staff / Reception',
-        icon: UserCheck,
-    },
-    {
-        id: 'doctor',
-        label: 'Doctor Side',
-        icon: Stethoscope,
-    },
-    {
-        id: 'admin',
-        label: 'Admin & Reports',
-        icon: LayoutDashboard,
-    },
-    {
-        id: 'super_admin',
-        label: 'Super Admin',
-        icon: ShieldAlert,
-    },
-];
 
 function App() {
     const [authSession, setAuthSessionState] = useState(() => getAuthSession());
@@ -96,64 +54,31 @@ function App() {
     const currentPortalToRender =
         authSession && allowedPortals.includes(activePortal) ? activePortal : 'client';
 
+    const sharedPortalProps = {
+        authSession,
+        activePortal: currentPortalToRender,
+        onSwitchPortal: (target) => {
+            if (authSession && allowedPortals.includes(target)) {
+                setActivePortal(target);
+            } else {
+                setLoginModalOpen(true);
+            }
+        },
+        onLogout: handleLogout,
+        notify,
+    };
+
     return (
-        <div className="min-h-screen bg-slate-200/70 flex flex-col">
-            {/* Authenticated Session Bar: ONLY visible when logged in as Doctor, Staff, Queuing TV, Admin, or Super Admin */}
-            {authSession && (
-                <div className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-md">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-3">
-                        <div className="flex items-center gap-2.5 text-xs">
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-teal-500/20 border border-teal-500/30 text-teal-300 font-extrabold uppercase">
-                                <User className="w-3.5 h-3.5" />
-                                {authSession.roleLabel || authSession.role}
-                            </span>
-                            <span className="font-semibold text-slate-200">
-                                {authSession.user?.name}
-                            </span>
-                        </div>
-
-                        {/* Show ONLY the portals this logged-in user's role is permitted to access */}
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                            {PORTALS.filter((p) => allowedPortals.includes(p.id)).map((portal) => {
-                                const Icon = portal.icon;
-                                const isActive = currentPortalToRender === portal.id;
-                                return (
-                                    <button
-                                        key={portal.id}
-                                        type="button"
-                                        onClick={() => setActivePortal(portal.id)}
-                                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${isActive
-                                                ? 'bg-teal-600 text-white shadow-sm'
-                                                : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
-                                            }`}
-                                    >
-                                        <Icon className="w-3.5 h-3.5" />
-                                        <span>{portal.label}</span>
-                                    </button>
-                                );
-                            })}
-
-                            <button
-                                type="button"
-                                onClick={handleLogout}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white border border-red-500/30 text-xs font-bold transition cursor-pointer ml-1"
-                            >
-                                <LogOut className="w-3.5 h-3.5" />
-                                <span>Sign Out</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
+        <div className="min-h-screen bg-slate-100 flex flex-col">
             {/* Toast Notification Banner */}
             {toast && (
-                <div className="fixed top-16 right-5 z-50 max-w-md animate-bounce">
+                <div className="fixed top-5 right-5 z-50 max-w-md animate-bounce">
                     <div
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border text-xs font-bold ${toast.type === 'error'
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border text-xs font-bold ${
+                            toast.type === 'error'
                                 ? 'bg-red-950 text-red-100 border-red-500'
                                 : 'bg-slate-900 text-emerald-300 border-emerald-500'
-                            }`}
+                        }`}
                     >
                         {toast.type === 'error' ? (
                             <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
@@ -166,28 +91,36 @@ function App() {
             )}
 
             {/* Active Portal View */}
-            <div className="flex-1">
+            <div className="flex-1 flex flex-col">
                 {currentPortalToRender === 'client' && (
-                    <ClientReservationPortal
-                        onSwitchPortal={(target) => {
-                            if (authSession && allowedPortals.includes(target)) {
-                                setActivePortal(target);
-                            } else {
-                                setLoginModalOpen(true);
-                            }
-                        }}
-                        onOpenLoginModal={() => setLoginModalOpen(true)}
-                        notify={notify}
-                        onOpenLegalModal={(tab) => setLegalModalTab(tab)}
-                    />
+                    <div className="flex-1 flex flex-col lg:flex-row min-h-screen">
+                        {authSession && (
+                            <aside className="w-full lg:w-64 xl:w-72 bg-slate-900 text-slate-200 p-5 flex flex-col justify-between shrink-0 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto border-r border-slate-800">
+                                <div className="space-y-4">
+                                    <div className="pb-4 border-b border-slate-800">
+                                        <CarePointLogo dark size="sm" />
+                                    </div>
+                                    <div className="text-xs text-slate-400 leading-relaxed">
+                                        Viewing the public Client Website while signed in. Use the sidebar below to return to your clinical or administrative workspace.
+                                    </div>
+                                </div>
+                                <PortalSidebarNav {...sharedPortalProps} />
+                            </aside>
+                        )}
+                        <div className="flex-1 min-w-0">
+                            <ClientReservationPortal
+                                {...sharedPortalProps}
+                                onOpenLoginModal={() => setLoginModalOpen(true)}
+                                onOpenLegalModal={(tab) => setLegalModalTab(tab)}
+                            />
+                        </div>
+                    </div>
                 )}
-                {currentPortalToRender === 'tv' && <TvQueuePortal />}
-                {currentPortalToRender === 'staff' && <StaffReceptionPortal notify={notify} />}
-                {currentPortalToRender === 'doctor' && <DoctorPortal notify={notify} />}
-                {currentPortalToRender === 'admin' && (
-                    <AdminPortal notify={notify} onSwitchPortal={setActivePortal} />
-                )}
-                {currentPortalToRender === 'super_admin' && <SuperAdminPortal notify={notify} />}
+                {currentPortalToRender === 'tv' && <TvQueuePortal {...sharedPortalProps} />}
+                {currentPortalToRender === 'staff' && <StaffReceptionPortal {...sharedPortalProps} />}
+                {currentPortalToRender === 'doctor' && <DoctorPortal {...sharedPortalProps} />}
+                {currentPortalToRender === 'admin' && <AdminPortal {...sharedPortalProps} />}
+                {currentPortalToRender === 'super_admin' && <SuperAdminPortal {...sharedPortalProps} />}
             </div>
 
             {/* Authorized Portal Sign-In Modal */}
