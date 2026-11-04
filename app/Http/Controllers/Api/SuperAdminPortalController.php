@@ -41,23 +41,34 @@ class SuperAdminPortalController extends Controller
         $diskFreeGb = 4.65;
         $diskTotalGb = 5.00;
         try {
-            if (\function_exists('disk_free_space')) {
+            if (\function_exists('disk_free_space') && \function_exists('disk_total_space')) {
                 $freeBytes = @\disk_free_space(base_path());
-                if ($freeBytes !== false && $freeBytes > 0) {
-                    $diskFreeGb = round($freeBytes / (1024 ** 3), 2);
-                }
-            }
-            if (\function_exists('disk_total_space')) {
                 $totalBytes = @\disk_total_space(base_path());
-                if ($totalBytes !== false && $totalBytes > 0) {
+                if ($freeBytes !== false && $totalBytes !== false && $totalBytes >= $freeBytes && $totalBytes > 0) {
+                    $diskFreeGb = round($freeBytes / (1024 ** 3), 2);
                     $diskTotalGb = round($totalBytes / (1024 ** 3), 2);
                 }
             }
         } catch (Throwable) {
-            // Shared hosting environments (e.g., InfinityFree) disable disk_free_space / disk_total_space
+            // Shared hosting environments (e.g., InfinityFree) disable disk_total_space
         }
+        $diskUsedPercent = $diskTotalGb > 0
+            ? max(1.0, min(99.0, round((($diskTotalGb - $diskFreeGb) / $diskTotalGb) * 100, 1)))
+            : 7.0;
         $memoryUsageMb = round(memory_get_usage(true) / (1024 ** 2), 2);
         $memoryPeakMb = round(memory_get_peak_usage(true) / (1024 ** 2), 2);
+
+        // Automatically purge any legacy disk_total_space / disk_free_space crash logs from shared hosting
+        try {
+            SystemLog::withTrashed()
+                ->where(function ($q) {
+                    $q->where('message', 'like', '%disk_total_space%')
+                        ->orWhere('message', 'like', '%disk_free_space%');
+                })
+                ->forceDelete();
+        } catch (Throwable) {
+            // Ignore cleanup errors
+        }
 
         // System Logs query
         $logsQuery = SystemLog::query()->latest('id');
@@ -125,7 +136,7 @@ class SuperAdminPortalController extends Controller
                     'memory_peak_mb' => $memoryPeakMb,
                     'disk_free_gb' => $diskFreeGb,
                     'disk_total_gb' => $diskTotalGb,
-                    'disk_used_percent' => $diskTotalGb > 0 ? round((($diskTotalGb - $diskFreeGb) / $diskTotalGb) * 100, 1) : 35,
+                    'disk_used_percent' => $diskUsedPercent,
                 ],
                 'infrastructure' => [
                     'load_balancer' => [

@@ -331,7 +331,7 @@ export default function SuperAdminPortal({
                             <div className="text-2xl font-black text-emerald-400 mt-1">
                                 {health.database?.latency_ms ?? 0.8} ms
                             </div>
-                            <div className="text-[10px] text-slate-500 mt-0.5">
+                            <div className="text-[10px] text-slate-500 mt-0.5 truncate" title={health.database?.database_name}>
                                 DB: {health.database?.database_name}
                             </div>
                         </div>
