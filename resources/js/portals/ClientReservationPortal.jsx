@@ -144,7 +144,6 @@ const CHECKUPS_DROPDOWN = [
 const PATIENT_RESOURCES_DROPDOWN = [
     { name: 'HMO Partners', target: 'hmo' },
     { name: 'Discount Cards', target: 'discounts' },
-    { name: 'Live Queue Tracker', target: 'booking' },
 ];
 
 const HMO_PARTNERS_LIST = [
@@ -232,18 +231,15 @@ export default function ClientReservationPortal({
     const [openDropdown, setOpenDropdown] = useState(null);
     const [openFaqIndex, setOpenFaqIndex] = useState(0);
 
-    // Multi-page navigator state ('home', 'services', 'checkups', 'resources', 'about', 'doctors', 'faqs', 'schedule')
     const [activePage, setActivePage] = useState(() => resolvePageFromLocation());
     const [highlightedItem, setHighlightedItem] = useState(() => {
         if (typeof window === 'undefined') return '';
         return new URLSearchParams(window.location.search).get('item') || '';
     });
 
-    // Find a Doctor page filter state
     const [doctorSearch, setDoctorSearch] = useState('');
     const [doctorDeptFilter, setDoctorDeptFilter] = useState('ALL');
 
-    // Booking form state
     const [departmentId, setDepartmentId] = useState('');
     const [doctorId, setDoctorId] = useState('');
     const [appointmentDate, setAppointmentDate] = useState(new Date().toISOString().slice(0, 10));
@@ -471,7 +467,6 @@ export default function ClientReservationPortal({
     const doctorsToShow = filteredDoctors.length > 0 ? filteredDoctors : availableDoctors;
     const selectedDoctorObj = availableDoctors.find((d) => String(d.id) === String(doctorId));
 
-    // Filtered doctors for the dedicated Find A Doctor page
     const directoryDoctors = availableDoctors.filter((doc) => {
         if (doctorDeptFilter !== 'ALL' && String(doc.department_id) !== String(doctorDeptFilter)) {
             return false;
@@ -545,7 +540,6 @@ export default function ClientReservationPortal({
                 onMouseLeave={() => setOpenDropdown(null)}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-                    {/* Brand Logo (Clicks back to Home Page Summary) */}
                     <div
                         onClick={() => navigateToPage('home')}
                         className="flex items-center gap-3 cursor-pointer"
@@ -562,9 +556,7 @@ export default function ClientReservationPortal({
                         </div>
                     </div>
 
-                    {/* Multi-Page Navigation Links */}
                     <nav className="flex items-center gap-1 lg:gap-4 flex-wrap text-sm font-semibold text-slate-700">
-                        {/* Home Summary Link */}
                         <button
                             type="button"
                             onClick={() => navigateToPage('home')}
@@ -577,7 +569,6 @@ export default function ClientReservationPortal({
                             Home
                         </button>
 
-                        {/* Page 1: Services (with dropdown to jump to any specific service on the Services Page) */}
                         <div
                             className="relative"
                             onMouseEnter={() => setOpenDropdown('services')}
@@ -611,7 +602,6 @@ export default function ClientReservationPortal({
                             )}
                         </div>
 
-                        {/* Page 2: Medical Check-Ups */}
                         <div
                             className="relative"
                             onMouseEnter={() => setOpenDropdown('checkups')}
@@ -646,7 +636,6 @@ export default function ClientReservationPortal({
                             )}
                         </div>
 
-                        {/* Page 3: Patient Resources */}
                         <div
                             className="relative"
                             onMouseEnter={() => setOpenDropdown('resources')}
@@ -680,7 +669,6 @@ export default function ClientReservationPortal({
                             )}
                         </div>
 
-                        {/* Page 4: About Us (Direct Link without dropdown) */}
                         <button
                             type="button"
                             onClick={() => navigateToPage('about')}
@@ -693,7 +681,6 @@ export default function ClientReservationPortal({
                             About Us
                         </button>
 
-                        {/* Page 5: Find A Doctor */}
                         <button
                             type="button"
                             onClick={() => navigateToPage('doctors')}
@@ -707,7 +694,6 @@ export default function ClientReservationPortal({
                         </button>
                     </nav>
 
-                    {/* Right CTA: SCHEDULE NOW */}
                     <div className="flex items-center gap-2">
                         {activePage === 'schedule' ? (
                             <button
@@ -718,28 +704,19 @@ export default function ClientReservationPortal({
                                 <ArrowLeft className="w-4 h-4" />
                                 <span>Back to Home</span>
                             </button>
-                            About Us
-                        </button>
-
-                        {openDropdown === 'about' && (
-                            <div className="absolute left-0 top-full mt-1 w-60 bg-white rounded-xl shadow-2xl border border-slate-100 py-3 z-50">
-                                {ABOUT_DROPDOWN.map((item) => (
-                                    <button
-                                        key={item.name}
-                                        type="button"
-                                        onClick={() => scrollToRef(servicesRefSection)}
-                                        className="w-full text-left px-5 py-2.5 text-sm font-semibold text-[#13467b] hover:bg-blue-50 transition block cursor-pointer"
-                                    >
-                                        {item.name}
-                                    </button>
-                                ))}
-                            </div>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={() => openSchedulePage()}
+                                className="px-5 py-2.5 rounded-lg bg-[#13467b] hover:bg-[#0e355e] text-white text-xs sm:text-sm font-extrabold tracking-wide uppercase shadow-md transition cursor-pointer"
+                            >
+                                SCHEDULE NOW
+                            </button>
                         )}
+                    </div>
                 </div>
+            </header>
 
-            {/* =====================================================================
-                PAGE 1: DEDICATED SCHEDULE NOW PAGE (/schedule)
-               ===================================================================== */}
             {activePage === 'schedule' && (
                 <section className="bg-slate-100 py-8 border-b border-slate-200 flex-1">
                     <div className="max-w-4xl mx-auto px-4 sm:px-6">
@@ -767,13 +744,6 @@ export default function ClientReservationPortal({
                                                 {bookedReceipt.appointment_time}
                                             </strong>
                                         </p>
-                                        <button
-                                            type="button"
-                                            onClick={() => setBookedReceipt(null)}
-                                            className="text-xs font-semibold text-emerald-800 underline cursor-pointer"
-                                        >
-                                            Dismiss Receipt
-                                        </button>
                                     </div>
                                     <button
                                         type="button"
@@ -858,8 +828,7 @@ export default function ClientReservationPortal({
                                             </span>
                                         </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     <div>
@@ -975,27 +944,6 @@ export default function ClientReservationPortal({
                                                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none"
                                             />
                                         </div>
-
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                                                Select Doctor
-                                            </label>
-                                            <select
-                                                value={doctorId}
-                                                onChange={(e) => setDoctorId(e.target.value)}
-                                                className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-800 shadow-2xs focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
-                                            >
-                                                {doctorsToShow.map((doc) => (
-                                                    <option key={doc.id} value={doc.id}>
-                                                        {doc.name} — {doc.room_number} (
-                                                        {doc.availability_status === 'active'
-                                                            ? 'Available'
-                                                            : doc.availability_status.replace('_', ' ')}
-                                                        )
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
                                     </div>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
@@ -1089,9 +1037,6 @@ export default function ClientReservationPortal({
                 </section>
             )}
 
-            {/* =====================================================================
-                PAGE 2: DEDICATED SERVICES PAGE (/services)
-               ===================================================================== */}
             {activePage === 'services' && (
                 <section className="py-12 bg-slate-50 border-b border-slate-200 flex-1">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10">
@@ -1117,7 +1062,6 @@ export default function ClientReservationPortal({
                             </button>
                         </div>
 
-                        {/* Service Filter Pills */}
                         <div className="flex flex-wrap gap-2">
                             <button
                                 type="button"
@@ -1146,7 +1090,6 @@ export default function ClientReservationPortal({
                             ))}
                         </div>
 
-                        {/* Detailed Service Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {SERVICES_DROPDOWN.filter(
                                 (s) => !highlightedItem || s.name.toLowerCase() === highlightedItem.toLowerCase()
@@ -1184,7 +1127,6 @@ export default function ClientReservationPortal({
                                                 ))}
                                             </ul>
                                         </div>
-                                    )}
 
                                         <div className="bg-slate-50 rounded-lg p-3 border border-slate-200/80 text-xs text-slate-600">
                                             <strong className="text-slate-800">Patient Preparation:</strong> {srv.prep}
@@ -1211,9 +1153,6 @@ export default function ClientReservationPortal({
                 </section>
             )}
 
-            {/* =====================================================================
-                PAGE 3: DEDICATED MEDICAL CHECK-UPS PAGE (/medical-check-ups)
-               ===================================================================== */}
             {activePage === 'checkups' && (
                 <section className="py-12 bg-slate-50 border-b border-slate-200 flex-1">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10">
@@ -1271,30 +1210,6 @@ export default function ClientReservationPortal({
                                                     </div>
                                                 </div>
                                             </div>
-                                        ) : (
-                                            <div className="flex flex-wrap gap-2.5">
-                                                {slots.map((slot) => {
-                                                    const isSelected =
-                                                        selectedSlot === slot.time && !slot.is_reserved;
-                                                    return (
-                                                        <button
-                                                            key={slot.time}
-                                                            type="button"
-                                                            disabled={slot.is_reserved}
-                                                            onClick={() => setSelectedSlot(slot.time)}
-                                                            className={`px-4 py-2 rounded-full text-xs font-bold transition border ${slot.is_reserved
-                                                                ? 'bg-slate-200 text-slate-500 border-slate-300 cursor-not-allowed'
-                                                                : isSelected
-                                                                    ? 'bg-teal-700 text-white border-teal-700 shadow-sm scale-[1.02] cursor-pointer'
-                                                                    : 'bg-teal-50/70 text-teal-900 border-teal-300 hover:bg-teal-100 cursor-pointer'
-                                                                }`}
-                                                        >
-                                                            {slot.time} {slot.is_reserved ? '(Reserved)' : ''}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                    </div>
 
                                             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                                                 {pkg.desc}
@@ -1313,21 +1228,10 @@ export default function ClientReservationPortal({
                                                     ))}
                                                 </ul>
                                             </div>
+
                                             <div className="bg-sky-50/80 rounded-xl p-3.5 border border-sky-200/70 text-xs text-slate-700">
                                                 <strong className="text-[#13467b]">Preparation Guidelines:</strong>{' '}
                                                 {pkg.prep}
-                                            </div>
-                                            <div>
-                                                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                                                    Email (Optional)
-                                                </label>
-                                                <input
-                                                    type="email"
-                                                    value={patientEmail}
-                                                    onChange={(e) => setPatientEmail(e.target.value)}
-                                                    placeholder="patient@email.com"
-                                                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none"
-                                                />
                                             </div>
                                         </div>
 
@@ -1347,9 +1251,6 @@ export default function ClientReservationPortal({
                 </section>
             )}
 
-            {/* =====================================================================
-                PAGE 4: DEDICATED PATIENT RESOURCES PAGE (/patient-resources)
-               ===================================================================== */}
             {activePage === 'resources' && (
                 <section className="py-12 bg-slate-50 border-b border-slate-200 flex-1">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
@@ -1375,7 +1276,6 @@ export default function ClientReservationPortal({
                             </button>
                         </div>
 
-                        {/* Section A: Accredited HMO Partners */}
                         <div className="space-y-5">
                             <div>
                                 <div className="text-xs font-extrabold uppercase tracking-widest text-teal-700">
@@ -1408,7 +1308,6 @@ export default function ClientReservationPortal({
                             </div>
                         </div>
 
-                        {/* Section B: Discount Cards & Privileges */}
                         <div className="space-y-5">
                             <div>
                                 <div className="text-xs font-extrabold uppercase tracking-widest text-[#13467b]">
@@ -1443,9 +1342,6 @@ export default function ClientReservationPortal({
                 </section>
             )}
 
-            {/* =====================================================================
-                PAGE 5: DEDICATED ABOUT US PAGE (/about-us)
-               ===================================================================== */}
             {activePage === 'about' && (
                 <section className="py-12 bg-white border-b border-slate-200 flex-1">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
@@ -1498,7 +1394,6 @@ export default function ClientReservationPortal({
                             </div>
                         </div>
 
-                        {/* Clinic Branches */}
                         <div className="bg-slate-900 text-white rounded-2xl p-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                             <div className="space-y-3">
                                 <span className="text-xs font-bold uppercase tracking-widest text-teal-400">
@@ -1529,9 +1424,6 @@ export default function ClientReservationPortal({
                 </section>
             )}
 
-            {/* =====================================================================
-                PAGE 6: DEDICATED FIND A DOCTOR PAGE (/find-a-doctor)
-               ===================================================================== */}
             {activePage === 'doctors' && (
                 <section className="py-12 bg-slate-50 border-b border-slate-200 flex-1">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-8">
@@ -1554,7 +1446,6 @@ export default function ClientReservationPortal({
                                 </button>
                             </div>
 
-                            {/* Search & Department Filter Bar */}
                             <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                                 <div className="md:col-span-7 relative">
                                     <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -1642,9 +1533,6 @@ export default function ClientReservationPortal({
                 </section>
             )}
 
-            {/* =====================================================================
-                PAGE 7: DEDICATED FAQS & CONTACT US PAGE (/faqs)
-               ===================================================================== */}
             {activePage === 'faqs' && (
                 <section className="py-12 bg-slate-50 border-b border-slate-200 flex-1">
                     <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-10">
@@ -1705,51 +1593,11 @@ export default function ClientReservationPortal({
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-        ) : (
-            <>
-                {/* 3. HERO BANNER (Matches HealthCube "Your Health Needs, All in One Place") */}
-                <section className="relative bg-gradient-to-r from-slate-900 via-[#13467b] to-teal-900 text-white overflow-hidden">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 lg:py-20 relative z-10 text-center max-w-3xl space-y-5">
-                        <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold uppercase tracking-wider text-teal-200 border border-white/20">
-                            <Sparkles className="w-3.5 h-3.5" />
-                            Seamless, Personalized Healthcare Designed to Empower You
-                        </span>
-                        <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
-                            Your Health Needs, All in One Place
-                        </h1>
-                        <p className="text-sm sm:text-base text-slate-200 leading-relaxed">
-                            Experience healthcare designed for your lifestyle. CarePoint & HealthCube Medical Clinics offer
-                            comprehensive medical consultations, executive check-ups, and advanced diagnostics with real-time
-                            smart queue tracking.
-                        </p>
-                        <div className="pt-2 flex flex-wrap items-center justify-center gap-3.5">
-                            <button
-                                type="button"
-                                onClick={() => openSchedulePage()}
-                                className="px-7 py-3 rounded-lg bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wide shadow-lg transition cursor-pointer"
-                            >
-                                Schedule Now
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => scrollToRef(servicesRefSection)}
-                                className="px-7 py-3 rounded-lg bg-[#13467b] hover:bg-[#0e355e] border border-blue-400/40 text-white font-extrabold text-xs sm:text-sm uppercase tracking-wide shadow-lg transition cursor-pointer"
-                            >
-                                Explore Services
-                            </button>
-                        </div>
-                    </div>
                 </section>
             )}
 
-            {/* =====================================================================
-                HOME PAGE (/): EXECUTIVE SUMMARY OF ALL OTHER PAGES
-               ===================================================================== */}
             {activePage === 'home' && (
                 <>
-                    {/* 1. HERO BANNER */}
                     <section className="relative bg-gradient-to-r from-slate-900 via-[#13467b] to-teal-900 text-white overflow-hidden">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 lg:py-20 relative z-10 text-center max-w-3xl space-y-5">
                             <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold uppercase tracking-wider text-teal-200 border border-white/20">
@@ -1763,14 +1611,11 @@ export default function ClientReservationPortal({
                                 Experience healthcare designed for your lifestyle. CarePoint & HealthCube Medical Clinics offer
                                 comprehensive medical consultations, executive check-ups, and advanced diagnostics.
                             </p>
-                        </div>
-
-                        {/* Medical Check-Up Packages Row */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                            {CHECKUPS_DROPDOWN.map((pkg) => (
-                                <div
-                                    key={pkg.name}
-                                    className="rounded-2xl border border-slate-200 bg-gradient-to-b from-sky-50/70 to-white p-6 flex flex-col justify-between shadow-2xs hover:shadow-md transition"
+                            <div className="pt-2 flex flex-wrap items-center justify-center gap-3.5">
+                                <button
+                                    type="button"
+                                    onClick={() => openSchedulePage()}
+                                    className="px-7 py-3 rounded-lg bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wide shadow-lg transition cursor-pointer"
                                 >
                                     Schedule Now
                                 </button>
@@ -1783,13 +1628,10 @@ export default function ClientReservationPortal({
                                 </button>
                             </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-                    {/* 2. SUMMARY OF SERVICES & MEDICAL CHECK-UPS */}
                     <section className="py-12 bg-white border-b border-slate-200">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10">
-                            {/* Summary Row A: Medical Check-Ups Preview */}
                             <div className="space-y-5">
                                 <div className="flex flex-wrap items-end justify-between gap-4">
                                     <div>
@@ -1835,16 +1677,7 @@ export default function ClientReservationPortal({
                                     ))}
                                 </div>
                             </div>
-                            <button
-                                type="button"
-                                onClick={onOpenLoginModal}
-                                className="text-xs font-bold text-[#13467b] underline cursor-pointer"
-                            >
-                                Are you a Physician or Staff? Sign In to Portal →
-                            </button>
-                        </div>
 
-                            {/* Summary Row B: Clinical Services Preview (Top 4 shown on Home Summary) */}
                             <div className="space-y-5 pt-4 border-t border-slate-100">
                                 <div className="flex flex-wrap items-end justify-between gap-4">
                                     <div>
@@ -1891,8 +1724,8 @@ export default function ClientReservationPortal({
                                 </div>
                             </div>
                         </div>
+                    </section>
 
-                    {/* 3. SUMMARY OF FIND A DOCTOR (Featured 3 Doctors + Link to Full Directory Page) */}
                     <section className="py-12 bg-slate-50 border-b border-slate-200">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-6">
                             <div className="flex flex-wrap items-end justify-between gap-4">
@@ -1952,10 +1785,8 @@ export default function ClientReservationPortal({
                         </div>
                     </section>
 
-                    {/* 4. SUMMARY OF ABOUT US, PATIENT RESOURCES & FAQS */}
                     <section className="py-12 bg-white border-b border-slate-200">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            {/* Card 1: About Us Summary */}
                             <div className="rounded-2xl border border-slate-200 p-6 bg-slate-50 flex flex-col justify-between space-y-4">
                                 <div className="space-y-2">
                                     <span className="text-xs font-extrabold uppercase tracking-widest text-[#13467b]">
@@ -1979,7 +1810,6 @@ export default function ClientReservationPortal({
                                 </button>
                             </div>
 
-                            {/* Card 2: Patient Resources Summary */}
                             <div className="rounded-2xl border border-slate-200 p-6 bg-slate-50 flex flex-col justify-between space-y-4">
                                 <div className="space-y-2">
                                     <span className="text-xs font-extrabold uppercase tracking-widest text-teal-700">
@@ -2003,7 +1833,6 @@ export default function ClientReservationPortal({
                                 </button>
                             </div>
 
-                            {/* Card 3: FAQs & Contact Summary */}
                             <div className="rounded-2xl border border-slate-200 p-6 bg-slate-50 flex flex-col justify-between space-y-4">
                                 <div className="space-y-2">
                                     <span className="text-xs font-extrabold uppercase tracking-widest text-[#13467b]">
@@ -2031,10 +1860,8 @@ export default function ClientReservationPortal({
                 </>
             )}
 
-            {/* 8. FULL BLACK FOOTER WITH LOCATIONS, CONTACT & LEGAL POLICIES */}
             <footer className="bg-[#05070a] text-slate-300 pt-14 pb-10 mt-auto">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 pb-10 border-b border-slate-800">
-                    {/* Column 1: Logo & Contact Us */}
                     <div className="space-y-4">
                         <CarePointLogo dark size="md" />
                         <div className="space-y-2 pt-2 text-xs">
@@ -2049,12 +1876,7 @@ export default function ClientReservationPortal({
                             </div>
                         </div>
                     </div>
-                </section>
-            </>
-        )
-    }
 
-                    {/* Column 2: Find Us Here */}
                     <div className="space-y-3 text-xs">
                         <h4 className="font-bold text-white text-sm">Find Us Here</h4>
                         <div className="flex items-start gap-2 leading-relaxed">
@@ -2067,7 +1889,6 @@ export default function ClientReservationPortal({
                         </div>
                     </div>
 
-                    {/* Column 3: Quick Links */}
                     <div className="space-y-2.5 text-xs">
                         <h4 className="font-bold text-white text-sm">Quick Links</h4>
                         <ul className="space-y-2">
@@ -2118,10 +1939,7 @@ export default function ClientReservationPortal({
                             </li>
                         </ul>
                     </div>
-                </div>
-            </div>
 
-                    {/* Column 4: Legal Policies */}
                     <div className="space-y-2.5 text-xs">
                         <h4 className="font-bold text-white text-sm">Legal, Privacy & Compliance</h4>
                         <ul className="space-y-2">
@@ -2164,130 +1982,38 @@ export default function ClientReservationPortal({
                         </ul>
                     </div>
                 </div>
-                <div className="flex items-start gap-2 leading-relaxed">
-                    <MapPin className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                    <span>5th Floor, GH Mall, Greenhills Comml Complex, San Juan, 1500 Metro Manila</span>
-                </div>
-            </div>
 
-            {/* Column 3: Quick Links */}
-            <div className="space-y-2.5 text-xs">
-                <h4 className="font-bold text-white text-sm">Quick Links</h4>
-                <ul className="space-y-2">
-                    <li>
-                        <button
-                            type="button"
-                            onClick={() => scrollToRef(servicesRefSection)}
-                            className="hover:text-white cursor-pointer"
-                        >
-                            Our Services
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                            type="button"
-                            onClick={() => handleQuickSelectService('Executive Check-Up')}
-                            className="hover:text-white cursor-pointer"
-                        >
-                            Executive Check-Ups
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                            type="button"
-                            onClick={() => scrollToRef(doctorsRefSection)}
-                            className="hover:text-white cursor-pointer"
-                        >
-                            Find A Doctor
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                            type="button"
-                            onClick={onOpenLoginModal}
-                            className="hover:text-white cursor-pointer text-teal-400 font-semibold"
-                        >
-                            Staff, Doctor, TV & Admin Login
-                        </button>
-                    </li>
-                </ul>
-            </div>
-
-            {/* Column 4: Patient Resources & Legal Policies */}
-            <div className="space-y-2.5 text-xs">
-                <h4 className="font-bold text-white text-sm">Legal, Privacy & Compliance</h4>
-                <ul className="space-y-2">
-                    <li>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500">
+                    <div>
+                        Copyright © 2026 – CarePoint & HealthCube Medical Clinics. All Rights Reserved.
+                    </div>
+                    <div className="flex items-center gap-4">
                         <button
                             type="button"
                             onClick={() => onOpenLegalModal('privacy')}
-                            className="hover:text-teal-300 cursor-pointer font-semibold"
+                            className="hover:text-slate-300 cursor-pointer"
                         >
-                            Privacy Policy (RA 10173 / HIPAA)
+                            Privacy Policy
                         </button>
-                    </li>
-                    <li>
+                        <span>•</span>
                         <button
                             type="button"
                             onClick={() => onOpenLegalModal('cookies')}
-                            className="hover:text-teal-300 cursor-pointer font-semibold"
+                            className="hover:text-slate-300 cursor-pointer"
                         >
-                            Cookie Policy & Consent Settings
+                            Cookie Policy
                         </button>
-                    </li>
-                    <li>
+                        <span>•</span>
                         <button
                             type="button"
                             onClick={() => onOpenLegalModal('terms')}
-                            className="hover:text-teal-300 cursor-pointer font-semibold"
+                            className="hover:text-slate-300 cursor-pointer"
                         >
-                            Terms and Agreements
+                            Terms & Agreements
                         </button>
-                    </li>
-                    <li>
-                        <button
-                            type="button"
-                            onClick={() => onOpenLegalModal('rights')}
-                            className="hover:text-teal-300 cursor-pointer font-semibold"
-                        >
-                            Patient Bill of Rights & HMO Policy
-                        </button>
-                    </li>
-                </ul>
-            </div>
+                    </div>
+                </div>
+            </footer>
         </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500">
-            <div>
-                Copyright © 2026 – CarePoint & HealthCube Medical Clinics. All Rights Reserved.
-            </div>
-            <div className="flex items-center gap-4">
-                <button
-                    type="button"
-                    onClick={() => onOpenLegalModal('privacy')}
-                    className="hover:text-slate-300 cursor-pointer"
-                >
-                    Privacy Policy
-                </button>
-                <span>•</span>
-                <button
-                    type="button"
-                    onClick={() => onOpenLegalModal('cookies')}
-                    className="hover:text-slate-300 cursor-pointer"
-                >
-                    Cookie Policy
-                </button>
-                <span>•</span>
-                <button
-                    type="button"
-                    onClick={() => onOpenLegalModal('terms')}
-                    className="hover:text-slate-300 cursor-pointer"
-                >
-                    Terms & Agreements
-                </button>
-            </div>
-        </div>
-    </footer>
-        </div >
     );
 }
